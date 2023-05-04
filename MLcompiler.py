@@ -36,7 +36,7 @@ symbolTable=pd.DataFrame(reservedWord,columns=['name','type','val'])
 
 # print(symbolTable.loc[:,'name'].values)
 
-pathfile=r'C:\Users\Nunan\Documents\GitHub\MLC\test1.mlc'
+pathfile=r'./test1.mlc'
 file=open(pathfile,'r')
 stream=[]
 for line in file:
