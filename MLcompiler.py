@@ -18,6 +18,17 @@ def checkFinalState(f,token):
     li=[token,type,val]
     return li
 
+class node:
+    type=''
+    val=None
+    childs=[]
+    def __init__(self, type,val=None):
+        self.type = type
+        self.val = val
+    
+    def addChild(self,obj):
+        self.childs.append(obj)
+
 states=['S','A','B','D','E','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20','F21','F22','F23','F24','F25','F26','F27','F28','F29']
 finalState=['F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20','F21','F22','F23','F24','F25','F26','F27','F28','F29']
 startState='S'
@@ -43,7 +54,6 @@ reservedWord=[['vect','reserved',None],['mat','reserved',None],['conr','reserved
               ,['print','reserved',None],['R','reserved',None],['C','reserved',None],['T','reserved',None]]
 symbolTable=pd.DataFrame(reservedWord,columns=['name','type','val'])
 
-# print(symbolTable.loc[:,'name'].values)
 
 pathfile=r'./test1.mlc'
 file=open(pathfile,'r')
