@@ -18,18 +18,27 @@ def checkFinalState(f,token):
     li=[token,type,val]
     return li
 
-states=['S','A','B','D','E','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20','F21','F22','F23','F24','F25','F26']
-finalState=['F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20','F21','F22','F23','F24','F25','F26']
+states=['S','A','B','D','E','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20','F21','F22','F23','F24','F25','F26','F27','F28','F29']
+finalState=['F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20','F21','F22','F23','F24','F25','F26','F27','F28','F29']
 startState='S'
 tFunct={('S','letter'):'A', ('A','letter'):'A', ('A','digit'):'A', ('S',';'):'F2', 
  ('S','|'):'B', ('B','|'):'F4', ('S','.'):'F5', ('S',','):'F6', ('S','/'):'F7', 
  ('S','@'):'F8', ('S','*'):'F9', ('S',':'):'F10',('S','{'):'F11',('S','}'):'F12',('S','('):'F13',
  ('S',')'):'F14',('S','['):'F15',('S',']'):'F16', ('S','>'):'F25',('S','<'):'F26',('F26','='):'D',('D','>'):'F17',
  ('S','='):'F18', ('S','^'):'F19', ('S','+'):'F20', ('S','-'):'F21', ('S','digit'):'F22', 
- ('F21','digit'):'F22', ('F21','>'):'F24', ('F22','digit'):'F22', ('F22','.'):'E', ('E','digit'):'F23', ('F23','digit'):'F23'}
+ ('F21','digit'):'F22', ('F21','>'):'F24', ('F22','digit'):'F22', ('F22','.'):'E', ('E','digit'):'F23', ('F23','digit'):'F23',('F7','/'):'F28',
+ ('F28','letter'):'F28', ('F28','digit'):'F28', ('F28',';'):'F28', ('F28','|'):'F28', ('F28','.'):'F28', ('F28',','):'F28',('F28','/'):'F28',  
+ ('F28','@'):'F28', ('F28','*'):'F28', ('F28',':'):'F28', ('F28','{'):'F28', ('F28','}'):'F28',('F28','('):'F28', ('F28',')'):'F28', ('F28','['):'F28', 
+ ('F28',']'):'F28', ('F28','>'):'F28', ('F28','<'):'F28', ('F28','='):'F28', ('F28','^'):'F28', ('F28','+'):'F28', ('F28','-'):'F28', ('F28',' '):'F28',
+ ('F7','*'):'H', ('H','letter'):'H', ('H','digit'):'H', ('H',';'):'H', ('H','|'):'H', ('H','.'):'H', ('H',','):'H',('H','/'):'H',  
+ ('H','@'):'H',  ('H',':'):'H', ('H','{'):'H', ('H','}'):'H',('H','('):'H', ('H',')'):'H', ('H','['):'H', 
+ ('H',']'):'H', ('H','>'):'H', ('H','<'):'H', ('H','='):'H', ('H','^'):'H', ('H','+'):'H', ('H','-'):'H', ('H',' '):'H',
+ ('H','*'):'I', ('I','/'):'F29', ('I','letter'):'H', ('I','digit'):'H', ('I',';'):'H', ('I','|'):'H', ('I','.'):'H', ('I',','):'H',('I','*'):'H',  
+ ('I','@'):'H',  ('I',':'):'H', ('I','{'):'H', ('I','}'):'H',('I','('):'H', ('I',')'):'H', ('I','['):'H', 
+ ('I',']'):'H', ('I','>'):'H', ('I','<'):'H', ('I','='):'H', ('I','^'):'H', ('I','+'):'H', ('I','-'):'H', ('I',' '):'H' }
 lookAheadFunct={'A':'F1','B':'F3'}
 tokenMap={'F1':'identifier', 'F2':';', 'F3':'|','F4':'||', 'F5':'.', 'F6':',', 'F7':'/','F8':'@', 'F9':'*','F10':':','F11':'{','F12':'}',
-          'F13':'(','F14':')','F15':'[','F16':']','F17':'<=>', 'F18':'=', 'F19':'exponent', 'F20':'+', 'F21':'-', 'F22':'num', 'F23':'num', 'F24':'->','F25':'>','F26':'<'}
+          'F13':'(','F14':')','F15':'[','F16':']','F17':'<=>', 'F18':'=', 'F19':'exponent', 'F20':'+', 'F21':'-', 'F22':'num', 'F23':'num', 'F24':'->','F25':'>','F26':'<','F28':'comment','F29':'comment'}
 reservedWord=[['vect','reserved',None],['mat','reserved',None],['conr','reserved',None],['conc','reserved',None],['row','reserved',None],['col','reserved',None]
               ,['print','reserved',None],['R','reserved',None],['C','reserved',None],['T','reserved',None]]
 symbolTable=pd.DataFrame(reservedWord,columns=['name','type','val'])
@@ -39,12 +48,17 @@ symbolTable=pd.DataFrame(reservedWord,columns=['name','type','val'])
 pathfile=r'./test1.mlc'
 file=open(pathfile,'r')
 stream=[]
+currentState='S'
+t=0
+token=''
+isComment=False
 for line in file:
     line=line.strip('\n')
-    print('loop')
-    currentState='S'
+    if not isComment:
+        currentState='S'
+        token=''
+        isComment=False
     t=0
-    token=''
     while t<len(line):
         # if len(stream)==10:
         #     print(stream)
@@ -55,13 +69,19 @@ for line in file:
             newEntry=checkFinalState(currentState,token)
             tupCheck=(currentState,checkLexemeType(line[t]))
             if tupCheck not in tFunct:
-                if token not in symbolTable.loc[:,'name'].values:
-                    print('not in')
-                    symbolTable.loc[len(symbolTable.index)] = newEntry
-                currentState='S'
-                stream.append(token)
-                print(token+'\n')
-                token=''
+                if(newEntry[1]!='comment'):
+                    if token not in symbolTable.loc[:,'name'].values:
+                        print('not in')
+                        symbolTable.loc[len(symbolTable.index)] = newEntry
+                    currentState='S'
+                    stream.append(token)
+                    print(token+'\n')
+                    token=''
+                else:
+                    currentState='S'
+                    token=''
+                    isComment=False
+            
         if line[t] == ' ':
             if currentState=='A':
                 currentState='F1'
@@ -77,15 +97,23 @@ for line in file:
             t+=1
             if t==len(line):
                 print('last')
+                if currentState =='H' or currentState == 'I':
+                    isComment=True
+                    break
                 if currentState in finalState:
                     newEntry=checkFinalState(currentState,token)
-                    if token not in symbolTable.loc[:,'name'].values:
-                        print('not in last')
-                        symbolTable.loc[len(symbolTable.index)] = newEntry
-                    currentState='S'
-                    stream.append(token)
-                    print(token+'\n')
-                    token=''
+                    if(newEntry[1]!='comment'):
+                        if token not in symbolTable.loc[:,'name'].values:
+                            print('not in last')
+                            symbolTable.loc[len(symbolTable.index)] = newEntry
+                        currentState='S'
+                        stream.append(token)
+                        print(token+'\n')
+                        token=''
+                    else:
+                        currentState='S'
+                        token=''
+                        isComment=False
         else:
             if currentState in lookAheadFunct:
                 currentState=lookAheadFunct[currentState]

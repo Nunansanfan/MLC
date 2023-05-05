@@ -34,6 +34,8 @@ m4 = m3|R(2:10:2), C(1:2:)|;
 print(m1 + m2 - (m3@m4)^T + m5^(-1) + m6*m2);
 m1.row;
 m1.col;
-/*hello world*/
 // this is a comment
-// hello
+// mat matrixJa; cant use
+/* test comment one*/
+/* test comment
+multiple lines*/
