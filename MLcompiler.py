@@ -18,16 +18,79 @@ def checkFinalState(f,token):
     li=[token,type,val]
     return li
 
+def parse(stream):
+    global stack,tree,productionRules,parsingTable,symbolTable
+    current = stack[-1][1]
+    print("stack before : "+str(stack))
+    for i in range(len(stream)):
+        realtype=symbolTable.loc[symbolTable['name']==stream[i],'type'].iloc[0]
+        print('token : '+stream[i]+', type : '+realtype)
+        if realtype=='reserved':
+            realtype=stream[i]
+        inpPair=(current,realtype)
+        outPair=parsingTable[inpPair]
+        action=outPair[0]
+        stateOrRule=outPair[1]
+        if action=='S':
+            current=stateOrRule
+            nodeType=symbolTable.loc[symbolTable['name']==stream[i],'type'].iloc[0]
+            nodeVal=symbolTable.loc[symbolTable['name']==stream[i],'val'].iloc[0]
+            shiftNode=node(stream[i],nodeType,nodeVal)
+            tree.append(shiftNode)
+            stack.append((stream[i],current))
+            print("shift stack : "+str(stack))
+        elif action=='R':
+            # 1. stateOrRule : เลข Rule ที่ต้องใช้ reduce
+            # 2. productionRules[stateOrRule] -> (Nonterminal หน้าลูกศร,จำนวนหลังลูกศร)
+            nonterminal=productionRules[stateOrRule][0]
+            count = productionRules[stateOrRule][1]
+            # 3. สร้าง node ใหม่ของ Nonterminal หน้าลูกศร
+            nonterNode=node(nonterminal,'nonterminal',None)
+            nonterNode.reduceAssign(stateOrRule)
+            # 4. pop "จำนวนหลังลูกศร" ตัวออกจาก stack, ดึง node จาก tree "จำนวนหลังลูกศร" ตัวจากด้านหลังเอาไปใส่ list child ของ node จากข้อ 3.
+            for j in range(count):
+                stack.pop()
+                temp=tree.pop()
+                print(temp.tokenName)
+                nonterNode.addChild(temp)
+            # 4.1. current = stack[-1][1] เปลี่ยนสถานะเป็นตัวสุดท้ายหลัง pop สิ่งที่ reduce ออกๆไปแล้ว
+            current = stack[-1][1]
+            # 5. หา current ใหม่ -> current = parsingTable[(current,Nonterminal หน้าลูกศร)][1]
+            current = parsingTable[(current,nonterminal)][1]
+            # 6. push ("Nonterminal หน้าลูกศร",current) ลง stack
+            stack.append((nonterminal,current))
+            # 7. tree.append(node ใหม่)
+            tree.append(nonterNode)
+            print('reduce : '+stateOrRule)
+            print('stack reduce : '+str(stack))
+            print('tree : '+str(tree))
+        elif action=='A':
+            return 'finished'
+    return 'unfinished'
+
+def showTree(node):
+    if node:
+        print(node.tokenName)
+        for nodei in node.childs:
+            showTree(nodei)
+
 class node:
+    tokenName=''
     type=''
     val=None
     childs=[]
-    def __init__(self, type,val=None):
+    reduceFrom=''
+    def __init__(self,tokenName,type,val=None):
+        self.tokenName=tokenName
         self.type = type
         self.val = val
     
     def addChild(self,obj):
         self.childs.append(obj)
+    
+    def reduceAssign(self,reduce):
+        self.reduceFrom=reduce
+
 
 states=['S','A','B','D','E','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20','F21','F22','F23','F24','F25','F26','F27','F28','F29']
 finalState=['F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','F13','F14','F15','F16','F17','F18','F19','F20','F21','F22','F23','F24','F25','F26','F27','F28','F29']
@@ -54,89 +117,34 @@ reservedWord=[['vect','reserved',None],['mat','reserved',None],['conr','reserved
               ,['print','reserved',None],['R','reserved',None],['C','reserved',None],['T','reserved',None]]
 symbolTable=pd.DataFrame(reservedWord,columns=['name','type','val'])
 
+# เลข production rule, ตัวหน้าลูกศร, จำนวนตัวหลังลูกศร (แลมด้าใส่ 0)
+productionRules={'P1':("Start'",1),'P2':("Start",1),'P3':("Start",1),'P4':("Start",1),'P5':("Start",1),'P6':("Start",1)
+                 ,'P9':("DecStmt",1),'P10':("DecStmt",1),'P44':("DecVectStmt",1),'P45':("DecVectStmt",1),'P46':("DecVect",4)
+                 ,'P47':("AssignVectSet",1),'P48':("AssignVectSet",0),'P49':("AssignVect",3),'P50':("VectAssign",2)
+                 ,'P51':("VectAssign'",3),'P52':("VectAssign'",1),'P53':("VectMember",2),'P54':("VectMember'",2)
+                 ,'P55':("VectMember'",0),'P56':("DecMatrixStmt",1),'P57':("DecMatrixStmt",1),'P58':("DecMatrix",4)
+                 ,'P59':("AssignMatrixSet",1),'P60':("AssignMatrixSet",0),'P61':("AssignMatrix",3),'P62':("MatrixAssign",2)
+                 ,'P62':("MatrixAssign",2),'P63':("MatrixAssign'",1),'P64':("MatrixAssign'",1),'P65':("MatrixAssign'",1)
+                 ,'P66':("MatrixAssign'",1),'P67':("MatrixAssign'",1)
+                 ,'P68':('AssignMatrix2',4),'P69':('VectSet',3),'P70':('VectSet',0),'P77':('AssignMatrix3',3),'P78':('RowTermSet',2)
+                 ,'P79':("RowTermSet'",2),'P80':("RowTermSet'",0),'P81':('RowTerm',2),'P82':("RowTerm'",1),'P83':("RowTerm'",0)
+                 ,'P84':('RowOpBlock',4),'P85':('RowOpList',2),'P86':("RowOpList'",2),'P87':("RowOpList'",0),'P88':('RowOp',3)
+                 ,'P89':('Action',3),'P90':('Action',2),'P91':('RowItOrAdd',5),'P92':('RowItOrAdd',3),'P93':("RowItOrAdd'",5)
+                 ,'P138':("RowItOrAdd'",1),'P94':('Operation',1),'P95':('Operation',1),'P96':('Mult',2),'P97':('Mult',0)
+                 ,'P98':('Divide',2),'P99':('Divide',0),'P100':('MatCPxp',2),'P101':("MatCPxp'",3),'P102':("MatCPxp'",0),'P103':('OpCP',1),'P104':('OpCP',1)
+                 ,'P105':("OpCP",1),'P106':("OpCP",1),'P107':("MatMxp",2),'P108':("MatMxp'",3),'P109':("MatMxp'",0),'P110':("OpM",1),'P111':("OpM",1),'P112':("MatPPxp",4),'P113':("MatPPxp",2)
+                 ,'P114':("MatPPxp",2),'P115':("MatPPxp'",0),'P116':("SupScript",1),'P117':("SupScript",3),'P118':("MatExp",1),'P119':("Submat",2),'P120':("Submat'",1),'P121':("Submat'",1)
+                 ,'P122':("SubOut",1),'P123':("RowColList",2),'P124':("RowColList'",2),'P125':("RowColList'",0),'P126':("RowCol",2),'P127':("RowCol",2),'P128':("SubIn",5),'P129':("RSlice",8),'P130':("CSlice",8)
+                 ,'P131':("SubTerm",1),'P132':("SubTerm",0),'P133':("DimRow",3),'P134':("DimCol",3),'P137':("PrintStmt",5)}
 
-pathfile=r'./test1.mlc'
-file=open(pathfile,'r')
-stream=[]
-currentState='S'
-t=0
-token=''
-isComment=False
-for line in file:
-    line=line.strip('\n')
-    if not isComment:
-        currentState='S'
-        token=''
-        isComment=False
-    t=0
-    while t<len(line):
-        # if len(stream)==10:
-        #     print(stream)
-        #     stream=[]
-        if token in [lis[0] for lis in reservedWord]:
-            currentState='F1'
-        if currentState in finalState:
-            newEntry=checkFinalState(currentState,token)
-            tupCheck=(currentState,checkLexemeType(line[t]))
-            if tupCheck not in tFunct:
-                if(newEntry[1]!='comment'):
-                    if token not in symbolTable.loc[:,'name'].values:
-                        print('not in')
-                        symbolTable.loc[len(symbolTable.index)] = newEntry
-                    currentState='S'
-                    stream.append(token)
-                    print(token+'\n')
-                    token=''
-                else:
-                    currentState='S'
-                    token=''
-                    isComment=False
-            
-        if line[t] == ' ':
-            if currentState=='A':
-                currentState='F1'
-            t+=1
-            print('blank space')
-            continue
-        inp = checkLexemeType(line[t])
-        tupInp = (currentState,inp)
-        print('current state: '+currentState+', read: '+line[t]+', t: '+str(t)+', token: '+token)
-        if tupInp in tFunct:
-            currentState=tFunct[tupInp]
-            token+=line[t]
-            t+=1
-            if t==len(line):
-                print('last')
-                if currentState =='H' or currentState == 'I':
-                    isComment=True
-                    break
-                if currentState in finalState:
-                    newEntry=checkFinalState(currentState,token)
-                    if(newEntry[1]!='comment'):
-                        if token not in symbolTable.loc[:,'name'].values:
-                            print('not in last')
-                            symbolTable.loc[len(symbolTable.index)] = newEntry
-                        currentState='S'
-                        stream.append(token)
-                        print(token+'\n')
-                        token=''
-                    else:
-                        currentState='S'
-                        token=''
-                        isComment=False
-        else:
-            if currentState in lookAheadFunct:
-                currentState=lookAheadFunct[currentState]
-        
-file.close()
-print(stream)
-display(symbolTable)
+                 
+                 
 
 # S = Shift
 # G = Go to
 # R = Reduce
 parsingTable={('S0','vect'):('S','G13'), ('S0','mat'):('S','N7'), ('S0','print'):('S','G38') , ('S0','/'):('S','G31'), ('S0','identifier'):('S','G28')  
-            , ('S0','identifier'):('S','N1')  , ('S0','Start'):('G','G1'), ('S0','DecStmt'):('G','G2'), ('S0','DecVectStmt'):('G','G7')
+            , ('S0','identifier'):('S','N1')  , ('S0',"Start"):('G','G1'), ('S0','DecStmt'):('G','G2'), ('S0',"DecVectStmt"):('G','G7')
             , ('S0','DecVect'):('G','G9'), ('S0','AssignVect'):('G','G10'), ('S0','DecMatrixStmt'):('G','G8'), ('S0','DecMatrix'):('G','G11')
             , ('S0','AssignMatrix'):('G','G12'), ('S0','DimRow'):('G','G3'), ('S0','DimCol'):('G','G4'), ('S0','PrintStmt'):('G','G6')
             , ('N1','='):('S','C0'), ('N1','.'):('S','N4'), ('N1','MatrixAssign'):('G','N2'), ('N2',';'):('S','N3'), ('N3','$'):('R','P61')
@@ -221,3 +229,86 @@ parsingTable={('S0','vect'):('S','G13'), ('S0','mat'):('S','N7'), ('S0','print')
             ('Y13','num'):('S','Y15'), ('Y13','RowTermSet'):('G','Y14'), ('Y13','RowTerm'):('G','Y11'), 
             ('Y14','}'):('R','P79'), ('Y15','}'):('R','P83'), ('Y15',','):('R','P83'), ('Y15','num'):('S','Y15'), ('Y15','RowTerm'):('G','Y17'), ('Y15','RowTerm’'):('G','Y16'), 
             ('Y16','}'):('R','P81'), ('Y16',','):('R','P81'), ('Y17','}'):('R','P82'), ('Y17',','):('R','P82')}
+
+stack=[('$','S0')]
+tree=[]
+
+pathfile=r'./test1.mlc'
+file=open(pathfile,'r')
+stream=[]
+currentState='S'
+t=0
+token=''
+isComment=False
+for line in file:
+    line=line.strip('\n')
+    if not isComment:
+        currentState='S'
+        token=''
+        isComment=False
+    t=0
+    while t<len(line):
+        if len(stream)>=10:
+            parse(stream)
+            stream=[]
+        if token in [lis[0] for lis in reservedWord]:
+            currentState='F1'
+        if currentState in finalState:
+            newEntry=checkFinalState(currentState,token)
+            tupCheck=(currentState,checkLexemeType(line[t]))
+            if tupCheck not in tFunct:
+                if(newEntry[1]!='comment'):
+                    if token not in symbolTable.loc[:,'name'].values:
+                        print('not in')
+                        symbolTable.loc[len(symbolTable.index)] = newEntry
+                    currentState='S'
+                    stream.append(token)
+                    print(token+'\n')
+                    token=''
+                else:
+                    currentState='S'
+                    token=''
+                    isComment=False
+            
+        if line[t] == ' ':
+            if currentState=='A':
+                currentState='F1'
+            t+=1
+            print('blank space')
+            continue
+        inp = checkLexemeType(line[t])
+        tupInp = (currentState,inp)
+        print('current state: '+currentState+', read: '+line[t]+', t: '+str(t)+', token: '+token)
+        if tupInp in tFunct:
+            currentState=tFunct[tupInp]
+            token+=line[t]
+            t+=1
+            if t==len(line):
+                print('last')
+                if currentState =='H' or currentState == 'I':
+                    isComment=True
+                    break
+                if currentState in finalState:
+                    newEntry=checkFinalState(currentState,token)
+                    if(newEntry[1]!='comment'):
+                        if token not in symbolTable.loc[:,'name'].values:
+                            print('not in last')
+                            symbolTable.loc[len(symbolTable.index)] = newEntry
+                        currentState='S'
+                        stream.append(token)
+                        print(token+'\n')
+                        token=''
+                    else:
+                        currentState='S'
+                        token=''
+                        isComment=False
+        else:
+            if currentState in lookAheadFunct:
+                currentState=lookAheadFunct[currentState]
+parse(stream)
+file.close()
+print(stream)
+display(symbolTable)
+root=tree[0]
+print(root.tokenName)
+showTree(root)
