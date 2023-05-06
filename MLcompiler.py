@@ -117,7 +117,7 @@ class node:
         self.childs=[]
 
     def __str__(self):
-        return str(self.id)+'_'+self.tokenName
+        return str(self.id)+'_'+self.tokenName+"_ reduceFrom : "+self.reduceFrom
     
     def addChild(self,obj):
         self.childs.append(obj)
