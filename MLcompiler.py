@@ -90,18 +90,15 @@ def parse(stream):
             current = stack[-1][1]
             i+=1
 
-def showTree(node):
+def showTree(node,level):
     treeStr=""
-    if len(node.childs)==0:
-        treeStr="leaf "+str(node)+"\n"
-    else:
-        if node:
-            treeStr+="Parent: "+str(node)+""
-            # print(str(node))
+    if node:
+        for i in range(level):
+            treeStr+="\t"
+        treeStr+="|- "+str(node)+"\n"
+        if(len(node.childs)>0):
             for nodei in node.childs:
-                treeStr+="\n-"+showTree(nodei)+" son of "+str(node)
-            # print('END sons of '+str(node))
-            treeStr+=" : son of "+str(node)+"\n"
+                treeStr+=showTree(nodei,level+1)
     return treeStr
 
 class node:
@@ -364,5 +361,5 @@ root=tree[0]
 #     root=root.childs[0]
 # print(root.tokenName)
 print('final tree : ')
-print(showTree(root))
+print(showTree(root,0))
 # print('final tree'+str(tree))
