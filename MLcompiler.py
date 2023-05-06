@@ -114,15 +114,28 @@ def semanticAnalyzer(root):
     return
 
 def codeGenerator(node):
+    global codeGenRules
     # วนใช้ codeGenerator กับลูกทุกตัวก่อน
+    for ch in node.childs:
+        codeGenerator(ch)
     # ดึง reduceFrom,type ของ node มา
+    prodRules=node.reduceFrom
+    typeNode=node.type
     # หาว่ามีใน dict codeGenRules มั้ย
-    # ไม่มีไม่ทำ ถ้ามีให้เอา list ของ code ออกมา
-    # วนใน list 
-        # ถ้าเจอ string -> บวกทบใน node.code
-        # ถ้าเจอ tuple -> check tuple[0] -> code หรือ name หรือ val
-            # ดึง childs[tuple[1]].code หรือ .name หรือ (ใส่ str() ด้วย).val มาบวกทบใน node.code
-    return
+    if (prodRules,typeNode) in codeGenRules:
+        code=codeGenRules[(prodRules,typeNode)][:]
+        for word in code:
+            # print('word : '+str(word))
+            if isinstance(word, str):
+                node.code=node.code+word
+            elif isinstance(word, tuple):
+                action = word[0]
+                if action == 'code':
+                    node.code = node.code+(node.childs[word[1]]).code
+                elif action == 'name':
+                    node.code = node.code+(node.childs[word[1]]).tokenName
+                elif action == 'val':
+                    node.code = node.code+str((node.childs[word[1]]).val)
 
 def showTree(node,level):
     treeStr=""
@@ -339,7 +352,7 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P84','nonterminal'):[('name',3),'[::,::]\n',('code',1)], ('P85','nonterminal'):[('code',1),('code',0)]
                 , ('P86','nonterminal'):['\n',('code',0)], ('P87','nonterminal'):[''], ('P88','nonterminal'):['rowI = ',('name',1),'\n',('code',0)]
                 , ('P89','nonterminal'):['rowJ = ',('name',0),'\nmat0[[rowI,rowJ]]=mat0[[rowJ,rowI]]']
-                , ('P90','nonterminal'):[('code','0')],('P91','nonterminal'):['mat0[rowI]=', ('name',4),'*mat0[rowI]',('code',0)],('P92','nonterminal'):['mat0[rowI]=mat0[rowI]',('code',0)]
+                , ('P90','nonterminal'):[('code',0)],('P91','nonterminal'):['mat0[rowI]=', ('name',4),'*mat0[rowI]',('code',0)],('P92','nonterminal'):['mat0[rowI]=mat0[rowI]',('code',0)]
                 , ('P93','nonterminal'):[('code',4),('code',3),'mat0[',('name',1),']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):[('name',1),'*']
                 , ('P97','nonterminal'):[''],('P98','nonterminal'):['/',('name',0)],('P99','nonterminal'):[''],('P100','oper'):['mat0=',('code',1),('code',0)],('P100','con'):['mat1=',('code',1),'\n',('code',0)]
                 , ('P101','oper'):[('code',2),('code',1),('code',0)],('P101','con'):['mat1 = np.concatenate(mat1,',('code',1),',axis=',('val',2),') \n', ('code',0),'\nmat0 = mat1']
@@ -347,7 +360,7 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P107','nonterminal'):[('code',1),('code',0)],('P108','nonterminal'):[('code',2),('code',1),('code',0)],('P109','nonterminal'):[''],('P110','nonterminal'):['@'],('P111','nonterminal'):['*']
                 , ('P112','transpose'):['np.transpose(',('code',2),')'],('P112','power'):['matrix_power(',('code',2),',',('val',0),')']
                 , ('P113','nonterminal'):[('code',1),('code',0)],('P115','nonterminal'):[''],('P118','nonterminal'):[('name',0)],('P119','nonterminal'):[('name',1),('code',0)]
-                , ('P120','nonterminal'):['\n',('code',0),'liRow.sort(reverse=True) \n liCol.sort(reverse=True) \n for i in liRow: \n\t np.delete(mat0,i,0) \n for i in liCol: \n\t np.delete(mat0,i,1)']
+                , ('P120','nonterminal'):['\n',('code',0),'liRow.sort(reverse=True)\nliCol.sort(reverse=True)\nfor i in liRow:\n\tnp.delete(mat0,i,0)\nfor i in liCol:\n\tnp.delete(mat0,i,1)']
                 , ('P121','nonterminal'):['[',('code',0),']'],('P122','nonterminal'):[ 'liRow=[]\nliCol=[]\n',('code',1)],('P123','nonterminal'):[('code',1),('code',0)],('P124','nonterminal'):['\n', ('code',0)]
                 , ('P125','nonterminal'):['\n'],('P126','nonterminal'):['liRow.append(',('name',0),')'],('P127','nonterminal'):['liCol.append(',('name',0),')'],('P128','nonterminal'):[('code',3), ',', ('code',1)]
                 , ('P129','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P130','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P131','nonterminal'):[('name',0)],('P132','nonterminal'):['']
@@ -436,6 +449,8 @@ display(symbolTable)
 print("len tree "+str(len(tree)))
 for t in tree:
     semanticAnalyzer(t)
+    codeGenerator(t)
+    print(t.code)
 
-print("tree 12 after semanticAnalyzer")
-print(showTree(tree[9],0))
+# print("tree 9 after semanticAnalyzer")
+# print(showTree(tree[9],0))
