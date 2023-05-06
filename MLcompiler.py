@@ -2,6 +2,7 @@ import pandas as pd
 import ast
 from IPython.display import display
 import itertools
+import os
 
 def checkLexemeType(t):
     if t.isalpha():
@@ -21,13 +22,10 @@ def checkFinalState(f,token):
 
 def parse(stream):
     global stack,tree,productionRules,parsingTable,symbolTable
-    # print('stream : '+str(stream))
     current = stack[-1][1]
-    # print("stack before : "+str(stack))
     i=0
     while(i<len(stream)):
         realtype=symbolTable.loc[symbolTable['name']==stream[i],'type'].iloc[0]
-        # print('token : '+stream[i]+', type : '+realtype)
         if realtype=='reserved':
             realtype=stream[i]
         inpPair=(current,realtype)
@@ -41,9 +39,6 @@ def parse(stream):
             shiftNode=node(stream[i],nodeType,nodeVal)
             tree.append(shiftNode)
             stack.append((stream[i],current))
-            # print("shift stack : "+str(stack))
-            # print("shift tree : "+str([str(i) for i in tree]))
-
             i+=1
         elif action=='R':
             # print('reduce : '+stateOrRule)
@@ -79,13 +74,8 @@ def parse(stream):
             nonterNode.reduceAssign("P1")
             stack.pop()
             temp=tree.pop()
-            # print("pop from tree : "+temp.tokenName)
-            # stack.append(("Start'",'G1'))
             nonterNode.addChild(temp)
             tree.append(nonterNode)
-            # print('finished')
-            # print('stack accept : '+str(stack))
-            # print('tree accept : '+str([str(i) for i in tree]))
 
             current = stack[-1][1]
             i+=1
@@ -125,7 +115,6 @@ def codeGenerator(node):
     if (prodRules,typeNode) in codeGenRules:
         code=codeGenRules[(prodRules,typeNode)][:]
         for word in code:
-            # print('word : '+str(word))
             if isinstance(word, str):
                 node.code=node.code+word
             elif isinstance(word, tuple):
@@ -136,15 +125,13 @@ def codeGenerator(node):
                     node.code = node.code+(node.childs[word[1]]).tokenName
                 elif action == 'val':
                     node.code = node.code+str((node.childs[word[1]]).val)
-    # print('code prod '+prodRules+' : '+node.code)
 
 def showTree(node,level):
     treeStr=""
     if node:
         for i in range(level):
             treeStr+="\t"
-        #+', code : '+node.code
-        treeStr+="|- "+str(node)+"\n"
+        treeStr+="|- "+str(node)+', code : '+node.code+"\n"
         if(len(node.childs)>0):
             for nodei in node.childs:
                 treeStr+=showTree(nodei,level+1)
@@ -292,7 +279,7 @@ parsingTable={('S0','vect'):('S','G13'), ('S0','mat'):('S','N7'), ('S0','print')
             ('C0','{'):('S','Y8'), ('C0','['):('S','Y1'), ('C0','('):('S','C17'), ('C0','identifier'):('S','N19'), ('C0',"MatrixAssign'"):('G','N12'), 
             ('C0','AssignMatrix2'):('G','N14'), ('C0','AssignMatrix3'):('G','N15'), ('C0','RowOpBlock'):('G','N16'), ('C0','MatCPxp'):('G','N17'), 
             ('C0','MatMxp'):('G','C1'), ('C0','MatPPxp'):('G','C10'), ('C0','MatExp'):('G','C27'), ('C0','Submat'):('G','N18'), 
-            ('C1','conr'):('S','C7'), ('C1','conc'):('S','C6'), ('C1',';'):('R','P102'), ('C1','+'):('S','C8'), ('C1','-'):('S','C9'), ('C1',"MatCPxp'"):('G','C2'), ('C1','OpCP'):('G','C3'), 
+            ('C1','conr'):('S','C7'), ('C1','conc'):('S','C6'), ('C1',')'):('R','P102'), ('C1',';'):('R','P102'), ('C1','+'):('S','C8'), ('C1','-'):('S','C9'), ('C1',"MatCPxp'"):('G','C2'), ('C1','OpCP'):('G','C3'), 
             ('C2','conr'):('R','P100'), ('C2','conc'):('R','P100'), ('C2',';'):('R','P100'), ('C2','+'):('R','P100'), ('C2','-'):('R','P100'), ('C2',')'):('R','P100'), 
             ('C3','('):('S','C17'), ('C3','identifier'):('S','C29'), ('C3','MatCPxp'):('G','C4'), ('C3','MatMxp'):('G','C1'), ('C3','MatPPxp'):('G','C10'), ('C3','MatExp'):('G','C27'), 
             ('C4','conr'):('R','P102'), ('C4','conc'):('R','P102'), ('C4',';'):('R','P102'), ('C4','+'):('R','P102'), ('C4','-'):('R','P102'), ('C4',"MatCPxp'"):('G','C5'), ('C4','OpCP'):('G','C3'), 
@@ -332,10 +319,11 @@ parsingTable={('S0','vect'):('S','G13'), ('S0','mat'):('S','N7'), ('S0','print')
 
 stack=[('$','S0')]
 tree=[]
-#
+
 semanticRules={('P62','type'):('index',0), ('P66','type'):('assign','MatCPxp'), ('P101','type'):('index',2), ('P103','type'):('assign','con'), ('P104','type'):('assign','con')
+               , ('P103','val'):('assign',1), ('P104','val'):('assign',0)
                , ('P105','type'):('assign','oper'), ('P106','type'):('assign','oper'), ('P112','type'):('index',0), ('P112','val'):('index',0), ('P113','type'):('index',0)
-               , ('P114','type'):('index',0), ('P114','val'):('index',0), ('P116','type'):('assign','transpose'), ('P117','type'):('assign','power'), ('P117','val'):('index',1),('P100','type'):('index',0), ('P102','type'):('assign','con')}
+               , ('P114','type'):('index',0), ('P114','val'):('index',0), ('P116','type'):('assign','transpose'), ('P117','type'):('assign','power'), ('P117','val'):('index',1),('P100','type'):('index',0)}
 
 # (รหัสProductionRules,typeของNonterminalตัวหน้าลูกศร):[list ของ code ที่ต้องมาบวกกัน]
 # ในlist สตริงปกติ เขียนครอบด้วย '' แต่ถ้าเป็นการ .code /  
@@ -343,28 +331,28 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P5','nonterminal'):[('code',0)],('P6','nonterminal'):[('code',0)],('P9','nonterminal'):[('code',0)],('P10','nonterminal'):[('code',0)],('P44','nonterminal'):[('code',0)]
                 , ('P45','nonterminal'):[('code',0)],('P46','nonterminal'):[('name',2),('code',1)],('P47','nonterminal'):[('code',0)],('P48','nonterminal'):['=[]'],('P49','nonterminal'):[('name',2),('code',1)]
                 , ('P50','nonterminal'):['=',('code',0)],('P51','nonterminal'):['np.array([',('code',1),'])'],('P52','nonterminal'):[('name',0)],('P53','nonterminal'):[('name',1),('code',0)],('P54','nonterminal'):[',',('code',0)]
-                , ('P55','nonterminal'):[''],('P56','nonterminal'):[('code',0)],('P57','nonterminal'):[('code',0)],('P58','nonterminal'):[('name',2),' = ',('code',1)],('P59','nonterminal'):[('code',0)]
-                , ('P60','nonterminal'):['[]\nmat0=[]'], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = mat0[::,::]']
+                , ('P55','nonterminal'):[''],('P56','nonterminal'):[('code',0)],('P57','nonterminal'):[('code',0)],('P58','nonterminal'):[('name',2),' = ',('code',1),'\n',('name',2),' = mat0[::,::]'],('P59','nonterminal'):[('code',0)]
+                , ('P60','nonterminal'):['[]\nmat0=np.array([[]])'], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = mat0[::,::]']
                 , ('P62','MatCPxp'):[('code',0)],('P62','nonterminal'):['mat0 = ',('code',0)], ('P63','nonterminal'):['np.array(',('code',0),')']
-                , ('P64','nonterminal'):['np.array(',('code',0),')'], ('P65','nonterminal'):[('code',0)], ('P66','nonterminal'):[('code',0)]
+                , ('P64','nonterminal'):['np.array(',('code',0),')'], ('P65','nonterminal'):[('code',0)], ('P66','MatCPxp'):['mat0 = ',('code',0)]
                 , ('P67','nonterminal'):[('code',0)], ('P68','nonterminal'):['[',('name',2),('code',1),']']
                 , ('P69','nonterminal'):[',',('name',1),('code',0)], ('P70','nonterminal'):[''], ('P77','nonterminal'):['[',('code',1),']']
                 , ('P78','nonterminal'):['[',('code',1),']',('code',0)], ('P79','nonterminal'):[',',('code',0)], ('P80','nonterminal'):['']
                 , ('P81','nonterminal'):[('name',1),('code',0)], ('P82','nonterminal'):[',',('code',0)], ('P83','nonterminal'):['']
                 , ('P84','nonterminal'):[('name',3),'[::,::]\n',('code',1)], ('P85','nonterminal'):[('code',1),('code',0)]
-                , ('P86','nonterminal'):['\n',('code',0)], ('P87','nonterminal'):[''], ('P88','nonterminal'):['rowI = ',('name',1),'\n',('code',0)]
-                , ('P89','nonterminal'):['rowJ = ',('name',0),'\nmat0[[rowI,rowJ]]=mat0[[rowJ,rowI]]']
+                , ('P86','nonterminal'):['\n',('code',0)], ('P87','nonterminal'):[''], ('P88','nonterminal'):['rowI = ',('name',1),'-1','\n',('code',0)]
+                , ('P89','nonterminal'):['rowJ = ',('name',0),'-1','\nmat0[[rowI,rowJ]]=mat0[[rowJ,rowI]]']
                 , ('P90','nonterminal'):[('code',0)],('P91','nonterminal'):['mat0[rowI]=', ('name',4),'*mat0[rowI]',('code',0)],('P92','nonterminal'):['mat0[rowI]=mat0[rowI]',('code',0)]
-                , ('P93','nonterminal'):[('code',4),('code',3),'mat0[',('name',1),']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):[('name',1),'*']
-                , ('P97','nonterminal'):[''],('P98','nonterminal'):['/',('name',0)],('P99','nonterminal'):[''],('P100','oper'):['mat0=',('code',1),('code',0)],('P100','con'):['mat1=',('code',1),'\n',('code',0)]
-                , ('P101','oper'):[('code',2),('code',1),('code',0)],('P101','con'):['mat1 = np.concatenate(mat1,',('code',1),',axis=',('val',2),') \n', ('code',0),'\nmat0 = mat1']
-                , ('P102','nonterminal'):[''],('P103','nonterminal'):[''],('P104','nonterminal'):[''],('P105','nonterminal'):[('name',0)],('P106','nonterminal'):[('name',0)]
+                , ('P93','nonterminal'):[('code',4),('code',3),'mat0[',('name',1),'-1',']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):[('name',1),'*']
+                , ('P97','nonterminal'):[''],('P98','nonterminal'):['/',('name',0)],('P99','nonterminal'):[''],('P100','oper'):[('code',1),('code',0)],('P100','con'):['mat1=',('code',1),'\n',('code',0)],('P100','nonterminal'):[('code',1)]
+                , ('P101','oper'):[('code',2),('code',1),('code',0)],('P101','con'):['mat1 = np.concatenate((mat1,',('code',1),'),axis=',('val',2),') \n', ('code',0),'mat0 = mat1']
+                , ('P102','nonterminal'):[''],('P103','nonterminal'):[''],('P104','nonterminal'):[''],('P105','oper'):[('name',0)],('P106','oper'):[('name',0)]
                 , ('P107','nonterminal'):[('code',1),('code',0)],('P108','nonterminal'):[('code',2),('code',1),('code',0)],('P109','nonterminal'):[''],('P110','nonterminal'):['@'],('P111','nonterminal'):['*']
-                , ('P112','transpose'):['np.transpose(',('code',2),')'],('P112','power'):['matrix_power(',('code',2),',',('val',0),')']
-                , ('P113','nonterminal'):[('code',1),('code',0)],('P115','nonterminal'):[''],('P118','nonterminal'):[('name',0)],('P119','nonterminal'):[('name',1),('code',0)]
+                , ('P112','transpose'):['np.transpose(',('code',2),')'],('P112','power'):['matrix_power(',('code',2),',',('val',0),')'] , ('P113','nonterminal'):[('code',1)]
+                , ('P113','transpose'):['np.transpose(',('code',1),')'],('P113','power'):['matrix_power(',('code',1),',',('val',0),')'],('P115','nonterminal'):[''],('P118','nonterminal'):[('name',0)],('P119','nonterminal'):[('name',1),('code',0)]
                 , ('P120','nonterminal'):['\n',('code',0),'liRow.sort(reverse=True)\nliCol.sort(reverse=True)\nfor i in liRow:\n\tnp.delete(mat0,i,0)\nfor i in liCol:\n\tnp.delete(mat0,i,1)']
                 , ('P121','nonterminal'):['[',('code',0),']'],('P122','nonterminal'):[ 'liRow=[]\nliCol=[]\n',('code',1)],('P123','nonterminal'):[('code',1),('code',0)],('P124','nonterminal'):['\n', ('code',0)]
-                , ('P125','nonterminal'):['\n'],('P126','nonterminal'):['liRow.append(',('name',0),')'],('P127','nonterminal'):['liCol.append(',('name',0),')'],('P128','nonterminal'):[('code',3), ',', ('code',1)]
+                , ('P125','nonterminal'):['\n'],('P126','nonterminal'):['liRow.append(',('name',0),'-1',')'],('P127','nonterminal'):['liCol.append(',('name',0),'-1',')'],('P128','nonterminal'):[('code',3), ',', ('code',1)]
                 , ('P129','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P130','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P131','nonterminal'):[('name',0)],('P132','nonterminal'):['']
                 , ('P133','nonterminal'):['print(len(', ('name',2), '))', '\n'],('P134','nonterminal'):['print(len(', ('name',2), '[0]))', '\n']}
 
@@ -446,13 +434,17 @@ for line in file:
                 currentState=lookAheadFunct[currentState]
 parse(stream)
 file.close()
-print(stream)
-display(symbolTable)
-print("len tree "+str(len(tree)))
+# display(symbolTable)
+
+listIden=list(symbolTable.loc[symbolTable['type']=='identifier']['name'])
+outputFile = open("MLC_Complied.py", "x")
+outputFile.write('import numpy as np' + '\n' + 'from numpy.linalg import matrix_power' + '\n')
 for t in tree:
     semanticAnalyzer(t)
     codeGenerator(t)
-    print(t.code)
-
-# print("tree 9 after semanticAnalyzer")
-print(showTree(tree[8],0))
+    outputFile.write(t.code+'\n')
+for id in listIden:
+    outputFile.write("print('this is "+id+"\\n'+str("+id+")+'\\n')\n")
+outputFile.close()
+os.system('python MLC_Complied.py')
+os.remove('MLC_Complied.py')

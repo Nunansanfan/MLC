@@ -29,8 +29,9 @@ m5=m1^(2);
 m5=m1^(-1); 
 m5=m1 conr m2; 
 mat m6 = m2 conc m3; 
-m4 = m3||R3,R2,C4,R4||; 
-m4 = m3|R(2:10:2), C(1:2:)|;  
+m4 = m3||R3,R2,C1||; 
+m4 = m3|R(:1:), C(1:2:)|;  
+specialMat=m1 + m2 - (m1@m2)^T + m1^(-1) + m1*m2;
 //print(m1 + m2 - (m3@m4)^T + m5^(-1) + m6*m2);
 // this is a comment
 // mat matrixJa; cant use
