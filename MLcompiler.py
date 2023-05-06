@@ -21,13 +21,13 @@ def checkFinalState(f,token):
 
 def parse(stream):
     global stack,tree,productionRules,parsingTable,symbolTable
-    print('stream : '+str(stream))
+    # print('stream : '+str(stream))
     current = stack[-1][1]
-    print("stack before : "+str(stack))
+    # print("stack before : "+str(stack))
     i=0
     while(i<len(stream)):
         realtype=symbolTable.loc[symbolTable['name']==stream[i],'type'].iloc[0]
-        print('token : '+stream[i]+', type : '+realtype)
+        # print('token : '+stream[i]+', type : '+realtype)
         if realtype=='reserved':
             realtype=stream[i]
         inpPair=(current,realtype)
@@ -41,12 +41,12 @@ def parse(stream):
             shiftNode=node(stream[i],nodeType,nodeVal)
             tree.append(shiftNode)
             stack.append((stream[i],current))
-            print("shift stack : "+str(stack))
+            # print("shift stack : "+str(stack))
             # print("shift tree : "+str([str(i) for i in tree]))
 
             i+=1
         elif action=='R':
-            print('reduce : '+stateOrRule)
+            # print('reduce : '+stateOrRule)
             # 1. stateOrRule : เลข Rule ที่ต้องใช้ reduce
             # 2. productionRules[stateOrRule] -> (Nonterminal หน้าลูกศร,จำนวนหลังลูกศร)
             nonterminal=productionRules[stateOrRule][0]
@@ -59,7 +59,7 @@ def parse(stream):
                 stack.pop()
                 temp=tree.pop()
                 # temp=(tree.pop()).deepCopy()
-                print("pop from tree : "+temp.tokenName)
+                # print("pop from tree : "+temp.tokenName)
                 nonterNode.addChild(temp)
             # 4.1. current = stack[-1][1] เปลี่ยนสถานะเป็นตัวสุดท้ายหลัง pop สิ่งที่ reduce ออกๆไปแล้ว
             current = stack[-1][1]
@@ -69,7 +69,7 @@ def parse(stream):
             stack.append((nonterminal,current))
             # 7. tree.append(node ใหม่)
             tree.append(nonterNode)
-            print('stack reduce : '+str(stack))
+            # print('stack reduce : '+str(stack))
             # print('tree reduce : '+str([str(i) for i in tree]))
 
             # print('tree : '+str(tree))
@@ -79,12 +79,12 @@ def parse(stream):
             nonterNode.reduceAssign("P1")
             stack.pop()
             temp=tree.pop()
-            print("pop from tree : "+temp.tokenName)
+            # print("pop from tree : "+temp.tokenName)
             # stack.append(("Start'",'G1'))
             nonterNode.addChild(temp)
             tree.append(nonterNode)
-            print('finished')
-            print('stack accept : '+str(stack))
+            # print('finished')
+            # print('stack accept : '+str(stack))
             # print('tree accept : '+str([str(i) for i in tree]))
 
             current = stack[-1][1]
@@ -136,12 +136,14 @@ def codeGenerator(node):
                     node.code = node.code+(node.childs[word[1]]).tokenName
                 elif action == 'val':
                     node.code = node.code+str((node.childs[word[1]]).val)
+    # print('code prod '+prodRules+' : '+node.code)
 
 def showTree(node,level):
     treeStr=""
     if node:
         for i in range(level):
             treeStr+="\t"
+        #+', code : '+node.code
         treeStr+="|- "+str(node)+"\n"
         if(len(node.childs)>0):
             for nodei in node.childs:
@@ -333,7 +335,7 @@ tree=[]
 #
 semanticRules={('P62','type'):('index',0), ('P66','type'):('assign','MatCPxp'), ('P101','type'):('index',2), ('P103','type'):('assign','con'), ('P104','type'):('assign','con')
                , ('P105','type'):('assign','oper'), ('P106','type'):('assign','oper'), ('P112','type'):('index',0), ('P112','val'):('index',0), ('P113','type'):('index',0)
-               , ('P114','type'):('index',0), ('P114','val'):('index',0), ('P116','type'):('assign','transpose'), ('P117','type'):('assign','power'), ('P117','val'):('index',1)}
+               , ('P114','type'):('index',0), ('P114','val'):('index',0), ('P116','type'):('assign','transpose'), ('P117','type'):('assign','power'), ('P117','val'):('index',1),('P100','type'):('index',0), ('P102','type'):('assign','con')}
 
 # (รหัสProductionRules,typeของNonterminalตัวหน้าลูกศร):[list ของ code ที่ต้องมาบวกกัน]
 # ในlist สตริงปกติ เขียนครอบด้วย '' แต่ถ้าเป็นการ .code /  
@@ -341,8 +343,8 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P5','nonterminal'):[('code',0)],('P6','nonterminal'):[('code',0)],('P9','nonterminal'):[('code',0)],('P10','nonterminal'):[('code',0)],('P44','nonterminal'):[('code',0)]
                 , ('P45','nonterminal'):[('code',0)],('P46','nonterminal'):[('name',2),('code',1)],('P47','nonterminal'):[('code',0)],('P48','nonterminal'):['=[]'],('P49','nonterminal'):[('name',2),('code',1)]
                 , ('P50','nonterminal'):['=',('code',0)],('P51','nonterminal'):['np.array([',('code',1),'])'],('P52','nonterminal'):[('name',0)],('P53','nonterminal'):[('name',1),('code',0)],('P54','nonterminal'):[',',('code',0)]
-                , ('P55','nonterminal'):[''],('P56','nonterminal'):[('code',0)],('P57','nonterminal'):[('code',0)],('P58','nonterminal'):[('name',2),('code',1)],('P59','nonterminal'):[('code',0)]
-                , ('P60','nonterminal'):['=[]'], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = mat0[::,::]']
+                , ('P55','nonterminal'):[''],('P56','nonterminal'):[('code',0)],('P57','nonterminal'):[('code',0)],('P58','nonterminal'):[('name',2),' = ',('code',1)],('P59','nonterminal'):[('code',0)]
+                , ('P60','nonterminal'):['[]\nmat0=[]'], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = mat0[::,::]']
                 , ('P62','MatCPxp'):[('code',0)],('P62','nonterminal'):['mat0 = ',('code',0)], ('P63','nonterminal'):['np.array(',('code',0),')']
                 , ('P64','nonterminal'):['np.array(',('code',0),')'], ('P65','nonterminal'):[('code',0)], ('P66','nonterminal'):[('code',0)]
                 , ('P67','nonterminal'):[('code',0)], ('P68','nonterminal'):['[',('name',2),('code',1),']']
@@ -356,7 +358,7 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P93','nonterminal'):[('code',4),('code',3),'mat0[',('name',1),']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):[('name',1),'*']
                 , ('P97','nonterminal'):[''],('P98','nonterminal'):['/',('name',0)],('P99','nonterminal'):[''],('P100','oper'):['mat0=',('code',1),('code',0)],('P100','con'):['mat1=',('code',1),'\n',('code',0)]
                 , ('P101','oper'):[('code',2),('code',1),('code',0)],('P101','con'):['mat1 = np.concatenate(mat1,',('code',1),',axis=',('val',2),') \n', ('code',0),'\nmat0 = mat1']
-                , ('P102','nonterminal'):[''],('P103','nonterminal'):[''],('P104','nonterminal'):[''],('P105','nonterminal'):[''],('P106','nonterminal'):['']
+                , ('P102','nonterminal'):[''],('P103','nonterminal'):[''],('P104','nonterminal'):[''],('P105','nonterminal'):[('name',0)],('P106','nonterminal'):[('name',0)]
                 , ('P107','nonterminal'):[('code',1),('code',0)],('P108','nonterminal'):[('code',2),('code',1),('code',0)],('P109','nonterminal'):[''],('P110','nonterminal'):['@'],('P111','nonterminal'):['*']
                 , ('P112','transpose'):['np.transpose(',('code',2),')'],('P112','power'):['matrix_power(',('code',2),',',('val',0),')']
                 , ('P113','nonterminal'):[('code',1),('code',0)],('P115','nonterminal'):[''],('P118','nonterminal'):[('name',0)],('P119','nonterminal'):[('name',1),('code',0)]
@@ -392,13 +394,13 @@ for line in file:
             if tupCheck not in tFunct:
                 if(newEntry[1]!='comment'):
                     if token not in symbolTable.loc[:,'name'].values:
-                        print('not in')
+                        # print('not in')
                         symbolTable.loc[len(symbolTable.index)] = newEntry
                     currentState='S'
                     stream.append(token)
                     if(token==';'):
                         stream.append('$')
-                    print(token+'\n')
+                    # print(token+'\n')
                     token=''
                 else:
                     currentState='S'
@@ -409,17 +411,17 @@ for line in file:
             if currentState=='A':
                 currentState='F1'
             t+=1
-            print('blank space')
+            # print('blank space')
             continue
         inp = checkLexemeType(line[t])
         tupInp = (currentState,inp)
-        print('current state: '+currentState+', read: '+line[t]+', t: '+str(t)+', token: '+token)
+        # print('current state: '+currentState+', read: '+line[t]+', t: '+str(t)+', token: '+token)
         if tupInp in tFunct:
             currentState=tFunct[tupInp]
             token+=line[t]
             t+=1
             if t==len(line):
-                print('last')
+                # print('last')
                 if currentState =='H' or currentState == 'I':
                     isComment=True
                     break
@@ -427,13 +429,13 @@ for line in file:
                     newEntry=checkFinalState(currentState,token)
                     if(newEntry[1]!='comment'):
                         if token not in symbolTable.loc[:,'name'].values:
-                            print('not in last')
+                            # print('not in last')
                             symbolTable.loc[len(symbolTable.index)] = newEntry
                         currentState='S'
                         stream.append(token)
                         if(token==';'):
                             stream.append('$')
-                        print(token+'\n')
+                        # print(token+'\n')
                         token=''
                     else:
                         currentState='S'
@@ -453,4 +455,4 @@ for t in tree:
     print(t.code)
 
 # print("tree 9 after semanticAnalyzer")
-# print(showTree(tree[9],0))
+print(showTree(tree[8],0))
