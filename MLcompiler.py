@@ -1,6 +1,7 @@
 import pandas as pd
 import ast
 from IPython.display import display
+import itertools
 
 def checkLexemeType(t):
     if t.isalpha():
@@ -41,6 +42,8 @@ def parse(stream):
             tree.append(shiftNode)
             stack.append((stream[i],current))
             print("shift stack : "+str(stack))
+            print("shift tree : "+str([str(i) for i in tree]))
+
             i+=1
         elif action=='R':
             print('reduce : '+stateOrRule)
@@ -67,6 +70,8 @@ def parse(stream):
             # 7. tree.append(node ใหม่)
             tree.append(nonterNode)
             print('stack reduce : '+str(stack))
+            print('tree reduce : '+str([str(i) for i in tree]))
+
             # print('tree : '+str(tree))
         elif action=='A':
             nonterminal="Start'"
@@ -80,17 +85,28 @@ def parse(stream):
             tree.append(nonterNode)
             print('finished')
             print('stack accept : '+str(stack))
+            print('tree accept : '+str([str(i) for i in tree]))
+
             current = stack[-1][1]
             i+=1
 
 def showTree(node):
-    if node:
-        print(node.tokenName)
-        for nodei in node.childs:
-            showTree(nodei)
-    return
+    treeStr=""
+    if len(node.childs)==0:
+        treeStr="leaf "+str(node)+"\n"
+    else:
+        if node:
+            treeStr+="Parent: "+str(node)+""
+            # print(str(node))
+            for nodei in node.childs:
+                treeStr+="\n-"+showTree(nodei)+" son of "+str(node)
+            # print('END sons of '+str(node))
+            treeStr+=" : son of "+str(node)+"\n"
+    return treeStr
 
 class node:
+    id_iter = itertools.count()
+    id=0
     tokenName=''
     type=''
     val=None
@@ -100,6 +116,11 @@ class node:
         self.tokenName=tokenName
         self.type = type
         self.val = val
+        self.id=next(self.id_iter)
+        self.childs=[]
+
+    def __str__(self):
+        return str(self.id)+'_'+self.tokenName
     
     def addChild(self,obj):
         self.childs.append(obj)
@@ -338,10 +359,10 @@ file.close()
 print(stream)
 display(symbolTable)
 root=tree[0]
-print(len(tree[0].childs))
 # while len(root.childs)!=0:
-#     print(root.tokenName)
+#     print(str(root))
 #     root=root.childs[0]
 # print(root.tokenName)
-# showTree(root)
+print('final tree : ')
+print(showTree(root))
 # print('final tree'+str(tree))
