@@ -42,7 +42,7 @@ def parse(stream):
             tree.append(shiftNode)
             stack.append((stream[i],current))
             print("shift stack : "+str(stack))
-            print("shift tree : "+str([str(i) for i in tree]))
+            # print("shift tree : "+str([str(i) for i in tree]))
 
             i+=1
         elif action=='R':
@@ -70,7 +70,7 @@ def parse(stream):
             # 7. tree.append(node ใหม่)
             tree.append(nonterNode)
             print('stack reduce : '+str(stack))
-            print('tree reduce : '+str([str(i) for i in tree]))
+            # print('tree reduce : '+str([str(i) for i in tree]))
 
             # print('tree : '+str(tree))
         elif action=='A':
@@ -85,10 +85,44 @@ def parse(stream):
             tree.append(nonterNode)
             print('finished')
             print('stack accept : '+str(stack))
-            print('tree accept : '+str([str(i) for i in tree]))
+            # print('tree accept : '+str([str(i) for i in tree]))
 
             current = stack[-1][1]
             i+=1
+
+def semanticAnalyzer(root):
+    global semanticRules,symbolTable
+    if len(root.childs)==0:
+        return
+    for node in root.childs:
+        semanticAnalyzer(node)
+    prod=root.reduceFrom
+    typeTupSearch=(prod,'type')
+    valTupSearch=(prod,'val')
+    if typeTupSearch in semanticRules:
+        (action,indOrStr)=semanticRules[typeTupSearch]
+        if action=='index':
+            root.type=(root.childs[indOrStr]).type
+        elif action=='assign':
+            root.type=indOrStr
+    if valTupSearch in semanticRules:
+        (action,indOrStr)=semanticRules[valTupSearch]
+        if action=='index':
+            root.val=(root.childs[indOrStr]).val
+        elif action=='assign':
+            root.val=indOrStr
+    return
+
+def codeGenerator(node):
+    # วนใช้ codeGenerator กับลูกทุกตัวก่อน
+    # ดึง reduceFrom,type ของ node มา
+    # หาว่ามีใน dict codeGenRules มั้ย
+    # ไม่มีไม่ทำ ถ้ามีให้เอา list ของ code ออกมา
+    # วนใน list 
+        # ถ้าเจอ string -> บวกทบใน node.code
+        # ถ้าเจอ tuple -> check tuple[0] -> code หรือ name หรือ val
+            # ดึง childs[tuple[1]].code หรือ .name หรือ (ใส่ str() ด้วย).val มาบวกทบใน node.code
+    return
 
 def showTree(node,level):
     treeStr=""
@@ -101,6 +135,13 @@ def showTree(node,level):
                 treeStr+=showTree(nodei,level+1)
     return treeStr
 
+def printTree():
+    global tree
+    print('tree accept : '+str([str(i) for i in tree]))
+    for node in tree:
+        print(node.tokenName)
+        print(showTree(node,0))
+
 class node:
     id_iter = itertools.count()
     id=0
@@ -109,15 +150,17 @@ class node:
     val=None
     childs=[]
     reduceFrom=''
+    code=''
     def __init__(self,tokenName,type,val=None):
         self.tokenName=tokenName
         self.type = type
         self.val = val
         self.id=next(self.id_iter)
         self.childs=[]
+        self.code=''
 
     def __str__(self):
-        return str(self.id)+'_'+self.tokenName+"_ reduceFrom : "+self.reduceFrom
+        return self.tokenName+"_ reduceFrom : "+self.reduceFrom+", type : "+self.type+", val : "+str(self.val)
     
     def addChild(self,obj):
         self.childs.append(obj)
@@ -274,6 +317,41 @@ parsingTable={('S0','vect'):('S','G13'), ('S0','mat'):('S','N7'), ('S0','print')
 
 stack=[('$','S0')]
 tree=[]
+#
+semanticRules={('P62','type'):('index',0), ('P66','type'):('assign','MatCPxp'), ('P101','type'):('index',2), ('P103','type'):('assign','con'), ('P104','type'):('assign','con')
+               , ('P105','type'):('assign','oper'), ('P106','type'):('assign','oper'), ('P112','type'):('index',0), ('P112','val'):('index',0), ('P113','type'):('index',0)
+               , ('P114','type'):('index',0), ('P114','val'):('index',0), ('P116','type'):('assign','transpose'), ('P117','type'):('assign','power'), ('P117','val'):('index',1)}
+
+# (รหัสProductionRules,typeของNonterminalตัวหน้าลูกศร):[list ของ code ที่ต้องมาบวกกัน]
+# ในlist สตริงปกติ เขียนครอบด้วย '' แต่ถ้าเป็นการ .code /  
+codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)],('P3','nonterminal'):[('code',0)],('P4','nonterminal'):[('code',0)]
+                , ('P5','nonterminal'):[('code',0)],('P6','nonterminal'):[('code',0)],('P9','nonterminal'):[('code',0)],('P10','nonterminal'):[('code',0)],('P44','nonterminal'):[('code',0)]
+                , ('P45','nonterminal'):[('code',0)],('P46','nonterminal'):[('name',2),('code',1)],('P47','nonterminal'):[('code',0)],('P48','nonterminal'):['=[]'],('P49','nonterminal'):[('name',2),('code',1)]
+                , ('P50','nonterminal'):['=',('code',0)],('P51','nonterminal'):['np.array([',('code',1),'])'],('P52','nonterminal'):[('name',0)],('P53','nonterminal'):[('name',1),('code',0)],('P54','nonterminal'):[',',('code',0)]
+                , ('P55','nonterminal'):[''],('P56','nonterminal'):[('code',0)],('P57','nonterminal'):[('code',0)],('P58','nonterminal'):[('name',2),('code',1)],('P59','nonterminal'):[('code',0)]
+                , ('P60','nonterminal'):['=[]'], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = mat0[::,::]']
+                , ('P62','MatCPxp'):[('code',0)],('P62','nonterminal'):['mat0 = ',('code',0)], ('P63','nonterminal'):['np.array(',('code',0),')']
+                , ('P64','nonterminal'):['np.array(',('code',0),')'], ('P65','nonterminal'):[('code',0)], ('P66','nonterminal'):[('code',0)]
+                , ('P67','nonterminal'):[('code',0)], ('P68','nonterminal'):['[',('name',2),('code',1),']']
+                , ('P69','nonterminal'):[',',('name',1),('code',0)], ('P70','nonterminal'):[''], ('P77','nonterminal'):['[',('code',1),']']
+                , ('P78','nonterminal'):['[',('code',1),']',('code',0)], ('P79','nonterminal'):[',',('code',0)], ('P80','nonterminal'):['']
+                , ('P81','nonterminal'):[('name',1),('code',0)], ('P82','nonterminal'):[',',('code',0)], ('P83','nonterminal'):['']
+                , ('P84','nonterminal'):[('name',3),'[::,::]\n',('code',1)], ('P85','nonterminal'):[('code',1),('code',0)]
+                , ('P86','nonterminal'):['\n',('code',0)], ('P87','nonterminal'):[''], ('P88','nonterminal'):['rowI = ',('name',1),'\n',('code',0)]
+                , ('P89','nonterminal'):['rowJ = ',('name',0),'\nmat0[[rowI,rowJ]]=mat0[[rowJ,rowI]]']
+                , ('P90','nonterminal'):[('code','0')],('P91','nonterminal'):['mat0[rowI]=', ('name',4),'*mat0[rowI]',('code',0)],('P92','nonterminal'):['mat0[rowI]=mat0[rowI]',('code',0)]
+                , ('P93','nonterminal'):[('code',4),('code',3),'mat0[',('name',1),']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):[('name',1),'*']
+                , ('P97','nonterminal'):[''],('P98','nonterminal'):['/',('name',0)],('P99','nonterminal'):[''],('P100','oper'):['mat0=',('code',1),('code',0)],('P100','con'):['mat1=',('code',1),'\n',('code',0)]
+                , ('P101','oper'):[('code',2),('code',1),('code',0)],('P101','con'):['mat1 = np.concatenate(mat1,',('code',1),',axis=',('val',2),') \n', ('code',0),'\nmat0 = mat1']
+                , ('P102','nonterminal'):[''],('P103','nonterminal'):[''],('P104','nonterminal'):[''],('P105','nonterminal'):[''],('P106','nonterminal'):['']
+                , ('P107','nonterminal'):[('code',1),('code',0)],('P108','nonterminal'):[('code',2),('code',1),('code',0)],('P109','nonterminal'):[''],('P110','nonterminal'):['@'],('P111','nonterminal'):['*']
+                , ('P112','transpose'):['np.transpose(',('code',2),')'],('P112','power'):['matrix_power(',('code',2),',',('val',0),')']
+                , ('P113','nonterminal'):[('code',1),('code',0)],('P115','nonterminal'):[''],('P118','nonterminal'):[('name',0)],('P119','nonterminal'):[('name',1),('code',0)]
+                , ('P120','nonterminal'):['\n',('code',0),'liRow.sort(reverse=True) \n liCol.sort(reverse=True) \n for i in liRow: \n\t np.delete(mat0,i,0) \n for i in liCol: \n\t np.delete(mat0,i,1)']
+                , ('P121','nonterminal'):['[',('code',0),']'],('P122','nonterminal'):[ 'liRow=[]\nliCol=[]\n',('code',1)],('P123','nonterminal'):[('code',1),('code',0)],('P124','nonterminal'):['\n', ('code',0)]
+                , ('P125','nonterminal'):['\n'],('P126','nonterminal'):['liRow.append(',('name',0),')'],('P127','nonterminal'):['liCol.append(',('name',0),')'],('P128','nonterminal'):[('code',3), ',', ('code',1)]
+                , ('P129','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P130','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P131','nonterminal'):[('name',0)],('P132','nonterminal'):['']
+                , ('P133','nonterminal'):['print(len(', ('name',2), '))', '\n'],('P134','nonterminal'):['print(len(', ('name',2), '[0]))', '\n']}
 
 pathfile=r'./test1.mlc'
 file=open(pathfile,'r')
@@ -355,11 +433,9 @@ parse(stream)
 file.close()
 print(stream)
 display(symbolTable)
-root=tree[0]
-# while len(root.childs)!=0:
-#     print(str(root))
-#     root=root.childs[0]
-# print(root.tokenName)
-print('final tree : ')
-print(showTree(root,0))
-# print('final tree'+str(tree))
+print("len tree "+str(len(tree)))
+for t in tree:
+    semanticAnalyzer(t)
+
+print("tree 12 after semanticAnalyzer")
+print(showTree(tree[9],0))
