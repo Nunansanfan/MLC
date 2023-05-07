@@ -1,7 +1,5 @@
 
-mat TPMatrix = { 1   2   3   4   5, 6   7    8   9   10, 11   12   13  14  15,   16  17  18  19  20}; 
-
-Matrix = TPMatrix^T;
+mat Matrix = { 1   2   3   4, 5   6   7    8 ,  9   10    11   12 ,  13  14  15   16,  17  18  19  20}; 
 
 mat matCUTR3 = Matrix||R3||; 
 mat matCUTR1R3C2C4;
