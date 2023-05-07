@@ -13,6 +13,7 @@ def checkCharType(t):
         return t
 
 def checkFinalState(f,token):
+    # what to store to symbol table
     type=tokenMap[f]
     val=None
     if type=='num':
@@ -217,7 +218,8 @@ productionRules={'P1':("Start'",1),'P2':("Start",1),'P3':("Start",1),'P4':("Star
                  ,'P114':("MatPPxp'",2),'P115':("MatPPxp'",0),'P116':("SupScript",1),'P117':("SupScript",3),'P118':("MatExp",1),'P119':("Submat",2),'P120':("Submat'",1),'P121':("Submat'",1)
                  ,'P122':("SubOut",3),'P123':("RowColList",2),'P124':("RowColList'",2),'P125':("RowColList'",0),'P126':("RowCol",2),'P127':("RowCol",2),'P128':("SubIn",5),'P129':("RSlice",8),'P130':("CSlice",8)
                  ,'P131':("SubTerm",1),'P132':("SubTerm",0),'P133':("DimRow",3),'P134':("DimCol",3),'P137':("PrintStmt",5)}
-
+stack=[('$','S0')]
+tree=[]
                   
 # S = Shift
 # G = Go to
@@ -313,8 +315,6 @@ parsingTable={('S0','vect'):('S','G13'), ('S0','mat'):('S','N7'), ('S0','print')
             ('Y14','}'):('R','P79'), ('Y15','}'):('R','P83'), ('Y15',','):('R','P83'), ('Y15','num'):('S','Y15'), ('Y15','RowTerm'):('G','Y17'), ('Y15',"RowTerm'"):('G','Y16'), 
             ('Y16','}'):('R','P81'), ('Y16',','):('R','P81'), ('Y17','}'):('R','P82'), ('Y17',','):('R','P82')}
 
-stack=[('$','S0')]
-tree=[]
 
 semanticRules={('P62','type'):('index',0), ('P66','type'):('assign','MatCPxp'), ('P101','type'):('index',2), ('P103','type'):('assign','con'), ('P104','type'):('assign','con')
                , ('P103','val'):('assign',1), ('P104','val'):('assign',0)
@@ -373,7 +373,6 @@ for line in file:
     while t<len(line):
         # parse 10 tokens each round
         if len(stream)>=10:
-            # print(stream)
             parse(stream)
             stream=[]
         # for R+num and C+num without blank space between them
@@ -447,7 +446,6 @@ outputFile.write('import numpy as np' + '\n' + 'from numpy.linalg import matrix_
 for t in tree:
     semanticAnalyzer(t)
     codeGenerator(t)
-    print(t.code)
     outputFile.write(t.code+'\n')
 
 listIden=list(symbolTable.loc[symbolTable['type']=='identifier']['name'])
