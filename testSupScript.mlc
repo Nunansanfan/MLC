@@ -1,0 +1,23 @@
+//Inverse of 2x2 matrix and Identity
+mat matSq2 = {1 2, 3 4};
+mat matSq2Inv = matSq2^(-1);
+mat idenMat2 = matSq2 @ matSq2Inv;
+
+//Inverse of 3x3 matrix and Identity
+vect v1 = <1,2,3>;
+vect v2 = <3,3,3>;
+vect v3 = <5,4,5>;
+//Define Matrix by vector
+mat matSq3 = [v1,v2,v3];
+mat matSq3Inv = matSq3^(-1);
+mat idenMat3 = matSq3 @ matSq3Inv;
+
+//Matrix Power
+mat matNormalSq = {1 0 0, 2 1 0, 3 0 0};
+mat matPower2 = matNormalSq^(2);
+mat idenMat = matNormalSq^(0);
+
+//Matrix Transpose
+mat matTransposeSq = matNormalSq^T;
+mat matNormal2x3 = {2 3 4, 5 6 7};
+mat matTranspose2x3 = matNormal2x3^T;
