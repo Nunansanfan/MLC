@@ -331,26 +331,26 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P5','nonterminal'):[('code',0)],('P6','nonterminal'):[('code',0)],('P9','nonterminal'):[('code',0)],('P10','nonterminal'):[('code',0)],('P44','nonterminal'):[('code',0)]
                 , ('P45','nonterminal'):[('code',0)],('P46','nonterminal'):[('name',2),('code',1)],('P47','nonterminal'):[('code',0)],('P48','nonterminal'):['=[]'],('P49','nonterminal'):[('name',2),('code',1)]
                 , ('P50','nonterminal'):['=',('code',0)],('P51','nonterminal'):['np.array([',('code',1),'])'],('P52','nonterminal'):[('name',0)],('P53','nonterminal'):[('name',1),('code',0)],('P54','nonterminal'):[',',('code',0)]
-                , ('P55','nonterminal'):[''],('P56','nonterminal'):[('code',0)],('P57','nonterminal'):[('code',0)],('P58','nonterminal'):[('name',2),' = ',('code',1),'\n',('name',2),' = mat0[::,::]'],('P59','nonterminal'):[('code',0)]
-                , ('P60','nonterminal'):['[]\nmat0=np.array([[]])'], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = mat0[::,::]']
-                , ('P62','MatCPxp'):[('code',0)],('P62','nonterminal'):['mat0 = ',('code',0)], ('P63','nonterminal'):['np.array(',('code',0),')']
-                , ('P64','nonterminal'):['np.array(',('code',0),')'], ('P65','nonterminal'):[('code',0)], ('P66','MatCPxp'):['mat0 = ',('code',0)]
+                , ('P55','nonterminal'):[''],('P56','nonterminal'):[('code',0)],('P57','nonterminal'):[('code',0)],('P58','nonterminal'):[('name',2),' = ',('code',1),'\n',('name',2),' = VAk5jgTwov[::,::]'],('P59','nonterminal'):[('code',0)]
+                , ('P60','nonterminal'):['[]\nVAk5jgTwov=np.array([[]])'], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = VAk5jgTwov[::,::]']
+                , ('P62','MatCPxp'):[('code',0)],('P62','nonterminal'):['VAk5jgTwov = ',('code',0)], ('P63','nonterminal'):['np.array(',('code',0),')']
+                , ('P64','nonterminal'):['np.array(',('code',0),')'], ('P65','nonterminal'):[('code',0)], ('P66','MatCPxp'):['VAk5jgTwov = ',('code',0)]
                 , ('P67','nonterminal'):[('code',0)], ('P68','nonterminal'):['[',('name',2),('code',1),']']
                 , ('P69','nonterminal'):[',',('name',1),('code',0)], ('P70','nonterminal'):[''], ('P77','nonterminal'):['[',('code',1),']']
                 , ('P78','nonterminal'):['[',('code',1),']',('code',0)], ('P79','nonterminal'):[',',('code',0)], ('P80','nonterminal'):['']
                 , ('P81','nonterminal'):[('name',1),('code',0)], ('P82','nonterminal'):[',',('code',0)], ('P83','nonterminal'):['']
                 , ('P84','nonterminal'):[('name',3),'[::,::]\n',('code',1)], ('P85','nonterminal'):[('code',1),('code',0)]
                 , ('P86','nonterminal'):['\n',('code',0)], ('P87','nonterminal'):[''], ('P88','nonterminal'):['rowI = ',('name',1),'-1','\n',('code',0)]
-                , ('P89','nonterminal'):['rowJ = ',('name',0),'-1','\nmat0[[rowI,rowJ]]=mat0[[rowJ,rowI]]']
-                , ('P90','nonterminal'):[('code',0)],('P91','nonterminal'):['mat0[rowI]=', ('name',4),'*mat0[rowI]',('code',0)],('P92','nonterminal'):['mat0[rowI]=mat0[rowI]',('code',0)]
-                , ('P93','nonterminal'):[('code',4),('code',3),'mat0[',('name',1),'-1',']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):[('name',1),'*']
-                , ('P97','nonterminal'):[''],('P98','nonterminal'):['/',('name',0)],('P99','nonterminal'):[''],('P100','oper'):[('code',1),('code',0)],('P100','con'):['mat1=',('code',1),'\n',('code',0)],('P100','nonterminal'):[('code',1)]
-                , ('P101','oper'):[('code',2),('code',1),('code',0)],('P101','con'):['mat1 = np.concatenate((mat1,',('code',1),'),axis=',('val',2),') \n', ('code',0),'mat0 = mat1']
+                , ('P89','nonterminal'):['rowJ = ',('name',0),'-1','\nVAk5jgTwov[[rowI,rowJ]]=VAk5jgTwov[[rowJ,rowI]]']
+                , ('P90','nonterminal'):[('code',0)],('P91','nonterminal'):['VAk5jgTwov[rowI]=', ('name',4),'*VAk5jgTwov[rowI]',('code',0)],('P92','nonterminal'):['VAk5jgTwov[rowI]=VAk5jgTwov[rowI]',('code',0)]
+                , ('P93','nonterminal'):[('code',4),('code',3),'VAk5jgTwov[',('name',1),'-1',']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):[('name',1),'*']
+                , ('P97','nonterminal'):[''],('P98','nonterminal'):['/',('name',0)],('P99','nonterminal'):[''],('P100','oper'):[('code',1),('code',0)],('P100','con'):['JgRqziwZte=',('code',1),'\n',('code',0)],('P100','nonterminal'):[('code',1)]
+                , ('P101','oper'):[('code',2),('code',1),('code',0)],('P101','con'):['JgRqziwZte = np.concatenate((JgRqziwZte,',('code',1),'),axis=',('val',2),') \n', ('code',0),'VAk5jgTwov = JgRqziwZte']
                 , ('P102','nonterminal'):[''],('P103','nonterminal'):[''],('P104','nonterminal'):[''],('P105','oper'):[('name',0)],('P106','oper'):[('name',0)]
                 , ('P107','nonterminal'):[('code',1),('code',0)],('P108','nonterminal'):[('code',2),('code',1),('code',0)],('P109','nonterminal'):[''],('P110','nonterminal'):['@'],('P111','nonterminal'):['*']
                 , ('P112','transpose'):['np.transpose(',('code',2),')'],('P112','power'):['matrix_power(',('code',2),',',('val',0),')'] , ('P113','nonterminal'):[('code',1)]
                 , ('P113','transpose'):['np.transpose(',('code',1),')'],('P113','power'):['matrix_power(',('code',1),',',('val',0),')'],('P115','nonterminal'):[''],('P118','nonterminal'):[('name',0)],('P119','nonterminal'):[('name',1),('code',0)]
-                , ('P120','nonterminal'):['\n',('code',0),'liRow.sort(reverse=True)\nliCol.sort(reverse=True)\nfor i in liRow:\n\tnp.delete(mat0,i,0)\nfor i in liCol:\n\tnp.delete(mat0,i,1)']
+                , ('P120','nonterminal'):['\n',('code',0),'liRow.sort(reverse=True)\nliCol.sort(reverse=True)\nfor i in liRow:\n\tnp.delete(VAk5jgTwov,i,0)\nfor i in liCol:\n\tnp.delete(VAk5jgTwov,i,1)']
                 , ('P121','nonterminal'):['[',('code',0),']'],('P122','nonterminal'):[ 'liRow=[]\nliCol=[]\n',('code',1)],('P123','nonterminal'):[('code',1),('code',0)],('P124','nonterminal'):['\n', ('code',0)]
                 , ('P125','nonterminal'):['\n'],('P126','nonterminal'):['liRow.append(',('name',0),'-1',')'],('P127','nonterminal'):['liCol.append(',('name',0),'-1',')'],('P128','nonterminal'):[('code',3), ',', ('code',1)]
                 , ('P129','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P130','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P131','nonterminal'):[('name',0)],('P132','nonterminal'):['']
@@ -376,16 +376,12 @@ for line in file:
     while t<len(line):
         # parse 10 tokens each round
         if len(stream)>=10:
-            print(stream)
+            # print(stream)
             parse(stream)
             stream=[]
-    
+        # for R+num and C+num without blank space between them
         if (token=='R' and checkCharType(line[t])=='digit') or (token=='C' and checkCharType(line[t])=='digit'):
             currentState='F1'
-
-        # found reserved word -> goto final state identifier
-        # if token in [lis[0] for lis in reservedWord]:
-        #     currentState='F1'
         # arrived final state
         if currentState in finalState:
             newEntry=checkFinalState(currentState,token)
@@ -454,6 +450,7 @@ outputFile.write('import numpy as np' + '\n' + 'from numpy.linalg import matrix_
 for t in tree:
     semanticAnalyzer(t)
     codeGenerator(t)
+    print(t.code)
     outputFile.write(t.code+'\n')
 for id in listIden:
     outputFile.write("print('this is "+id+"\\n'+str("+id+")+'\\n')\n")
