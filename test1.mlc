@@ -19,6 +19,8 @@ mat m4 = m2{
     R2->R2+R3/3 
 }; 
 
+mat matrix555;
+
 mat m5; 
 m5=m1+m2; 
 m5=m1-m2; 

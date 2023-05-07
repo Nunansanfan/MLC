@@ -4,7 +4,7 @@ from IPython.display import display
 import itertools
 import os
 
-def checkLexemeType(t):
+def checkCharType(t):
     if t.isalpha():
         return 'letter'
     elif t.isdigit():
@@ -356,6 +356,7 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P129','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P130','nonterminal'):[('code',5), ':', ('code',3), ':', ('code',1)],('P131','nonterminal'):[('name',0)],('P132','nonterminal'):['']
                 , ('P133','nonterminal'):['print(len(', ('name',2), '))', '\n'],('P134','nonterminal'):['print(len(', ('name',2), '[0]))', '\n']}
 
+# set up file & scanner --------------------------------------------------------------------------------
 pathfile=r'./test1.mlc'
 file=open(pathfile,'r')
 stream=[]
@@ -363,67 +364,78 @@ currentState='S'
 t=0
 token=''
 isComment=False
+# start scanner ----------------------------------------------------------------------------------------
 for line in file:
     line=line.strip('\n')
     if not isComment:
         currentState='S'
         token=''
         isComment=False
+    # t = pointer point to each character in line
     t=0
     while t<len(line):
+        # parse 10 tokens each round
         if len(stream)>=10:
+            print(stream)
             parse(stream)
             stream=[]
-        if token in [lis[0] for lis in reservedWord]:
+    
+        if (token=='R' and checkCharType(line[t])=='digit') or (token=='C' and checkCharType(line[t])=='digit'):
             currentState='F1'
+
+        # found reserved word -> goto final state identifier
+        # if token in [lis[0] for lis in reservedWord]:
+        #     currentState='F1'
+        # arrived final state
         if currentState in finalState:
             newEntry=checkFinalState(currentState,token)
-            tupCheck=(currentState,checkLexemeType(line[t]))
+            tupCheck=(currentState,checkCharType(line[t]))
+            # check if there are any transition that we can go
             if tupCheck not in tFunct:
+                # store token to symbol table without duplication
                 if(newEntry[1]!='comment'):
                     if token not in symbolTable.loc[:,'name'].values:
-                        # print('not in')
                         symbolTable.loc[len(symbolTable.index)] = newEntry
+                    # reset everything, if received ; then append $ to stream
                     currentState='S'
                     stream.append(token)
                     if(token==';'):
                         stream.append('$')
-                    # print(token+'\n')
                     token=''
                 else:
                     currentState='S'
                     token=''
                     isComment=False
-            
+        # if found blank space -> skip it, if in state A then we found an identifier
         if line[t] == ' ':
             if currentState=='A':
                 currentState='F1'
             t+=1
-            # print('blank space')
             continue
-        inp = checkLexemeType(line[t])
+
+        # check for transition
+        inp = checkCharType(line[t])
         tupInp = (currentState,inp)
-        # print('current state: '+currentState+', read: '+line[t]+', t: '+str(t)+', token: '+token)
         if tupInp in tFunct:
             currentState=tFunct[tupInp]
             token+=line[t]
             t+=1
+            # if it is the end of the line then store the last token to stream
             if t==len(line):
-                # print('last')
+                # if it is multiple line comment then go to next line with comment status = True
                 if currentState =='H' or currentState == 'I':
                     isComment=True
                     break
+                # don't have to check transition because it is last character now
                 if currentState in finalState:
                     newEntry=checkFinalState(currentState,token)
                     if(newEntry[1]!='comment'):
                         if token not in symbolTable.loc[:,'name'].values:
-                            # print('not in last')
                             symbolTable.loc[len(symbolTable.index)] = newEntry
                         currentState='S'
                         stream.append(token)
                         if(token==';'):
                             stream.append('$')
-                        # print(token+'\n')
                         token=''
                     else:
                         currentState='S'
