@@ -282,8 +282,8 @@ parsingTable={('S0','vect'):('S','G13'), ('S0','mat'):('S','N7'), ('S0','print')
             ('C1','conr'):('S','C7'), ('C1','conc'):('S','C6'), ('C1',')'):('R','P102'), ('C1',';'):('R','P102'), ('C1','+'):('S','C8'), ('C1','-'):('S','C9'), ('C1',"MatCPxp'"):('G','C2'), ('C1','OpCP'):('G','C3'), 
             ('C2','conr'):('R','P100'), ('C2','conc'):('R','P100'), ('C2',';'):('R','P100'), ('C2','+'):('R','P100'), ('C2','-'):('R','P100'), ('C2',')'):('R','P100'), 
             ('C3','('):('S','C17'), ('C3','identifier'):('S','C29'), ('C3','MatCPxp'):('G','C4'), ('C3','MatMxp'):('G','C1'), ('C3','MatPPxp'):('G','C10'), ('C3','MatExp'):('G','C27'), 
-            ('C4','conr'):('R','P102'), ('C4','conc'):('R','P102'), ('C4',';'):('R','P102'), ('C4','+'):('R','P102'), ('C4','-'):('R','P102'), ('C4',"MatCPxp'"):('G','C5'), ('C4','OpCP'):('G','C3'), 
-            ('C5','conr'):('R','P101'), ('C5','conc'):('R','P101'), ('C5',';'):('R','P101'), ('C5','+'):('R','P101'), ('C5','-'):('R','P101'), 
+            ('C4','conr'):('R','P102'), ('C4','conc'):('R','P102'), ('C4',';'):('R','P102'), ('C4','+'):('R','P102'), ('C4','-'):('R','P102'), ('C4',')'):('R','P102'), ('C4',"MatCPxp'"):('G','C5'), ('C4','OpCP'):('G','C3'), 
+            ('C5','conr'):('R','P101'), ('C5','conc'):('R','P101'), ('C5',';'):('R','P101'), ('C5','+'):('R','P101'), ('C5','-'):('R','P101'),  ('C5',')'):('R','P101'),
             ('C6','('):('R','P103'), ('C6','identifier'):('R','P103'), ('C7','('):('R','P104'), ('C7','identifier'):('R','P104'), 
             ('C8','('):('R','P105'), ('C8','identifier'):('R','P105'), ('C9','('):('R','P106'), ('C9','identifier'):('R','P106'), 
             ('C10','conr'):('R','P109'), ('C10','conc'):('R','P109'), ('C10',';'):('R','P109'), ('C10','+'):('R','P109'), ('C10','-'):('R','P109'), 
@@ -298,6 +298,8 @@ parsingTable={('S0','vect'):('S','G13'), ('S0','mat'):('S','N7'), ('S0','print')
             ('C17','('):('S','C17'), ('C17','identifier'):('S','C29'), ('C17','MatCPxp'):('G','C18'), ('C17','MatMxp'):('G','C1'), ('C17','MatPPxp'):('G','C10'), ('C17','MatExp'):('G','C27'), 
             ('C18',')'):('S','C19'), ('C19','^'):('S','C21'), ('C19',"MatPPxp'"):('G','C20'), ('C20','conr'):('R','P112'), ('C20','conc'):('R','P112'), ('C20',';'):('R','P112'), 
             ('C20','+'):('R','P112'), ('C20','-'):('R','P112'), ('C20','@'):('R','P112'), ('C20','*'):('R','P112'), ('C20',')'):('R','P112'), 
+            ('C19','conr'):('R','P115'), ('C19','conc'):('R','P115'), ('C19',';'):('R','P115'), 
+            ('C19','+'):('R','P115'), ('C19','-'):('R','P115'), ('C19','@'):('R','P115'), ('C19','*'):('R','P115'), ('C19',')'):('R','P115'),
             ('C21','('):('S','C24'), ('C21','T'):('S','C23'), ('C21','SupScript'):('G','C22'), ('C22','conr'):('R','P114'), ('C22','conc'):('R','P114'), ('C22',';'):('R','P114'), 
             ('C22','+'):('R','P114'), ('C22','-'):('R','P114'), ('C22','@'):('R','P114'), ('C22','*'):('R','P114'), ('C22',')'):('R','P114'), 
             ('C23','conr'):('R','P116'), ('C23','conc'):('R','P116'), ('C23',';'):('R','P116'), ('C23','+'):('R','P116'), ('C23','-'):('R','P116'), 
@@ -330,11 +332,11 @@ semanticRules={('P62','type'):('index',0), ('P66','type'):('assign','MatCPxp'), 
 codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)],('P3','nonterminal'):[('code',0)],('P4','nonterminal'):[('code',0)]
                 , ('P5','nonterminal'):[('code',0)],('P6','nonterminal'):[('code',0)],('P9','nonterminal'):[('code',0)],('P10','nonterminal'):[('code',0)],('P44','nonterminal'):[('code',0)]
                 , ('P45','nonterminal'):[('code',0)],('P46','nonterminal'):[('name',2),('code',1)],('P47','nonterminal'):[('code',0)],('P48','nonterminal'):['=[]'],('P49','nonterminal'):[('name',2),('code',1)]
-                , ('P50','nonterminal'):['=',('code',0)],('P51','nonterminal'):['np.array([',('code',1),'])'],('P52','nonterminal'):[('name',0)],('P53','nonterminal'):[('name',1),('code',0)],('P54','nonterminal'):[',',('code',0)]
+                , ('P50','nonterminal'):['=',('code',0)],('P51','nonterminal'):['np.array([',('code',1),"],dtype='f')"],('P52','nonterminal'):[('name',0)],('P53','nonterminal'):[('name',1),('code',0)],('P54','nonterminal'):[',',('code',0)]
                 , ('P55','nonterminal'):[''],('P56','nonterminal'):[('code',0)],('P57','nonterminal'):[('code',0)],('P58','nonterminal'):[('name',2),' = ',('code',1),'\n',('name',2),' = np.round(VAk5jgTwov.copy(),2)'],('P59','nonterminal'):[('code',0)]
-                , ('P60','nonterminal'):['[]\nVAk5jgTwov=np.array([[]])'], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = np.round(VAk5jgTwov.copy(),2)']
-                , ('P62','MatCPxp'):[('code',0)],('P62','nonterminal'):['VAk5jgTwov = ',('code',0)], ('P63','nonterminal'):['np.array(',('code',0),').T']
-                , ('P64','nonterminal'):['np.array(',('code',0),')'], ('P65','nonterminal'):[('code',0)], ('P66','MatCPxp'):['VAk5jgTwov = ',('code',0)]
+                , ('P60','nonterminal'):["[]\nVAk5jgTwov=np.array([[]],dtype='f')"], ('P61','nonterminal'):[('code',1),'\n',('name',2),' = np.round(VAk5jgTwov.copy(),2)']
+                , ('P62','MatCPxp'):[('code',0)],('P62','nonterminal'):['VAk5jgTwov = ',('code',0)], ('P63','nonterminal'):['np.array(',('code',0),",dtype='f').T"]
+                , ('P64','nonterminal'):['np.array(',('code',0),",dtype='f')"], ('P65','nonterminal'):[('code',0)], ('P66','MatCPxp'):['VAk5jgTwov = ',('code',0)]
                 , ('P67','nonterminal'):[('code',0)], ('P68','nonterminal'):['[',('name',2),('code',1),']']
                 , ('P69','nonterminal'):[',',('name',1),('code',0)], ('P70','nonterminal'):[''], ('P77','nonterminal'):['[',('code',1),']']
                 , ('P78','nonterminal'):['[',('code',1),']',('code',0)], ('P79','nonterminal'):[',',('code',0)], ('P80','nonterminal'):['']
@@ -343,12 +345,12 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P86','nonterminal'):['\n',('code',0)], ('P87','nonterminal'):[''], ('P88','nonterminal'):['rowI = ',('name',1),'-1','\n',('code',0)]
                 , ('P89','nonterminal'):['rowJ = ',('name',0),'-1','\nVAk5jgTwov[[rowI,rowJ]]=VAk5jgTwov[[rowJ,rowI]]']
                 , ('P90','nonterminal'):[('code',0)],('P91','nonterminal'):['VAk5jgTwov[rowI]=', ('name',4),'*VAk5jgTwov[rowI]',('code',0)],('P92','nonterminal'):['VAk5jgTwov[rowI]=VAk5jgTwov[rowI]',('code',0)]
-                , ('P93','nonterminal'):[('code',4),('code',3),'VAk5jgTwov[',('name',1),'-1',']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):[('name',1),'*']
-                , ('P97','nonterminal'):[''],('P98','nonterminal'):['/',('name',0)],('P99','nonterminal'):[''],('P100','oper'):[('code',1),('code',0)],('P100','con'):['JgRqziwZte=',('code',1),'\n',('code',0)],('P100','nonterminal'):[('code',1)]
+                , ('P93','nonterminal'):[('code',4),('code',3),'VAk5jgTwov[',('name',1),'-1',']',('code',0)],('P138','nonterminal'):[('code',0)],('P94','nonterminal'):['+'],('P95','nonterminal'):['-'],('P96','nonterminal'):['float(',('name',1),')*']
+                , ('P97','nonterminal'):[''],('P98','nonterminal'):['/float(',('name',0),')'],('P99','nonterminal'):[''],('P100','oper'):[('code',1),('code',0)],('P100','con'):['JgRqziwZte=',('code',1),'\n',('code',0)],('P100','nonterminal'):[('code',1)]
                 , ('P101','oper'):[('code',2),('code',1),('code',0)],('P101','con'):['JgRqziwZte = np.concatenate((JgRqziwZte,',('code',1),'),axis=',('val',2),') \n', ('code',0),'VAk5jgTwov = JgRqziwZte']
                 , ('P102','nonterminal'):[''],('P103','nonterminal'):[''],('P104','nonterminal'):[''],('P105','oper'):[('name',0)],('P106','oper'):[('name',0)]
                 , ('P107','nonterminal'):[('code',1),('code',0)],('P108','nonterminal'):[('code',2),('code',1),('code',0)],('P109','nonterminal'):[''],('P110','nonterminal'):['@'],('P111','nonterminal'):['*']
-                , ('P112','transpose'):['np.transpose(',('code',2),')'],('P112','power'):['matrix_power(',('code',2),',',('val',0),')'] , ('P113','nonterminal'):[('code',1)]
+                , ('P112','transpose'):['np.transpose((',('code',2),'))'],('P112','power'):['matrix_power((',('code',2),'),',('val',0),')'],('P112','nonterminal'):['(',('code',2),')'] , ('P113','nonterminal'):[('code',1)]
                 , ('P113','transpose'):['np.transpose(',('code',1),')'],('P113','power'):['matrix_power(',('code',1),',',('val',0),')'],('P115','nonterminal'):[''],('P118','nonterminal'):[('name',0)],('P119','nonterminal'):[('name',1),('code',0)]
                 , ('P120','nonterminal'):['\n',('code',0),'liRow.sort(reverse=True)\nliCol.sort(reverse=True)\nfor i in liRow:\n\tVAk5jgTwov=np.delete(VAk5jgTwov,i,0)\nfor i in liCol:\n\tVAk5jgTwov=np.delete(VAk5jgTwov,i,1)']
                 , ('P121','nonterminal'):['[',('code',0),']'],('P122','nonterminal'):[ 'liRow=[]\nliCol=[]\n',('code',1)],('P123','nonterminal'):[('code',1),('code',0)],('P124','nonterminal'):['\n', ('code',0)]
