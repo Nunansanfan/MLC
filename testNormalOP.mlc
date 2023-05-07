@@ -1,0 +1,15 @@
+// normal operation
+mat ansPlus = m2+m3;
+mat ansMinus;
+ansMinus = m2-m3;
+mat ansMul1 = m2@m3; // @ = cross
+mat ansMul2 = m2*m3; // * = dot
+
+// concatenate
+mat matrixConcatRow = m2 conr m3;
+mat matrixConcatCol = m2 conc m3;
+
+
+// mixed
+mat m4 = {5 4 , 3 2};
+mat specialMat = ((m2+m3)*m4)^T+m2^(2);

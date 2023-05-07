@@ -25,6 +25,7 @@ def parse(stream):
     current = stack[-1][1]
     i=0
     while(i<len(stream)):
+        # check type of token : identifier / num / reserved word (have to change to original word) etx.
         realtype=symbolTable.loc[symbolTable['name']==stream[i],'type'].iloc[0]
         if realtype=='reserved':
             realtype=stream[i]
@@ -32,7 +33,9 @@ def parse(stream):
         outPair=parsingTable[inpPair]
         action=outPair[0]
         stateOrRule=outPair[1]
+        # shift -> create node for that token & add to tree, shift
         if action=='S':
+            # change state
             current=stateOrRule
             nodeType=symbolTable.loc[symbolTable['name']==stream[i],'type'].iloc[0]
             nodeVal=symbolTable.loc[symbolTable['name']==stream[i],'val'].iloc[0]
@@ -40,8 +43,8 @@ def parse(stream):
             tree.append(shiftNode)
             stack.append((stream[i],current))
             i+=1
+        # reduce
         elif action=='R':
-            # print('reduce : '+stateOrRule)
             # 1. stateOrRule : เลข Rule ที่ต้องใช้ reduce
             # 2. productionRules[stateOrRule] -> (Nonterminal หน้าลูกศร,จำนวนหลังลูกศร)
             nonterminal=productionRules[stateOrRule][0]
@@ -53,8 +56,6 @@ def parse(stream):
             for j in range(count):
                 stack.pop()
                 temp=tree.pop()
-                # temp=(tree.pop()).deepCopy()
-                # print("pop from tree : "+temp.tokenName)
                 nonterNode.addChild(temp)
             # 4.1. current = stack[-1][1] เปลี่ยนสถานะเป็นตัวสุดท้ายหลัง pop สิ่งที่ reduce ออกๆไปแล้ว
             current = stack[-1][1]
@@ -64,10 +65,6 @@ def parse(stream):
             stack.append((nonterminal,current))
             # 7. tree.append(node ใหม่)
             tree.append(nonterNode)
-            # print('stack reduce : '+str(stack))
-            # print('tree reduce : '+str([str(i) for i in tree]))
-
-            # print('tree : '+str(tree))
         elif action=='A':
             nonterminal="Start'"
             nonterNode=node(nonterminal,'nonterminal',None)
@@ -76,12 +73,11 @@ def parse(stream):
             temp=tree.pop()
             nonterNode.addChild(temp)
             tree.append(nonterNode)
-
             current = stack[-1][1]
             i+=1
 
 def semanticAnalyzer(root):
-    global semanticRules,symbolTable
+    global semanticRules
     if len(root.childs)==0:
         return
     for node in root.childs:
@@ -222,9 +218,7 @@ productionRules={'P1':("Start'",1),'P2':("Start",1),'P3':("Start",1),'P4':("Star
                  ,'P122':("SubOut",3),'P123':("RowColList",2),'P124':("RowColList'",2),'P125':("RowColList'",0),'P126':("RowCol",2),'P127':("RowCol",2),'P128':("SubIn",5),'P129':("RSlice",8),'P130':("CSlice",8)
                  ,'P131':("SubTerm",1),'P132':("SubTerm",0),'P133':("DimRow",3),'P134':("DimCol",3),'P137':("PrintStmt",5)}
 
-                 
-                 
-
+                  
 # S = Shift
 # G = Go to
 # R = Reduce
@@ -359,7 +353,7 @@ codeGenRules={('P1','nonterminal'):[('code',0)],('P2','nonterminal'):[('code',0)
                 , ('P133','nonterminal'):['print(len(', ('name',2), '))', '\n'],('P134','nonterminal'):['print(len(', ('name',2), '[0]))', '\n']}
 
 # set up file & scanner --------------------------------------------------------------------------------
-pathfile=r'./test1.mlc'
+pathfile=r'./testRowOP.mlc'
 file=open(pathfile,'r')
 stream=[]
 currentState='S'
@@ -369,6 +363,7 @@ isComment=False
 # start scanner ----------------------------------------------------------------------------------------
 for line in file:
     line=line.strip('\n')
+    # if it is not comment -> reset everything
     if not isComment:
         currentState='S'
         token=''
@@ -439,6 +434,7 @@ for line in file:
                         currentState='S'
                         token=''
                         isComment=False
+        # else = no normal transition -> then check if there are lookahead transition
         else:
             if currentState in lookAheadFunct:
                 currentState=lookAheadFunct[currentState]
@@ -446,7 +442,6 @@ parse(stream)
 file.close()
 # display(symbolTable)
 
-listIden=list(symbolTable.loc[symbolTable['type']=='identifier']['name'])
 outputFile = open("MLC_Complied.py", "x")
 outputFile.write('import numpy as np' + '\n' + 'from numpy.linalg import matrix_power' + '\n')
 for t in tree:
@@ -454,8 +449,11 @@ for t in tree:
     codeGenerator(t)
     print(t.code)
     outputFile.write(t.code+'\n')
+
+listIden=list(symbolTable.loc[symbolTable['type']=='identifier']['name'])
 for id in listIden:
     outputFile.write("print('this is "+id+"\\n'+str("+id+")+'\\n')\n")
 outputFile.close()
+
 os.system('python MLC_Complied.py')
 os.remove('MLC_Complied.py')
