@@ -1,0 +1,13 @@
+
+mat TPMatrix = { 1   2   3   4   5, 6   7    8   9   10, 11   12   13  14  15,   16  17  18  19  20}; 
+
+Matrix = TPMatrix^T;
+
+mat testCUTR3 = Matrix||R3||; 
+mat testCUTR1R3C2C4;
+testCUTR1R3C2C4 = Matrix||R1,R3,C2,C4||; 
+
+mat testR1to2 = Matrix|R(:2:), C(::)|;
+mat testCs2 = Matrix|R(::), C(::2)|;
+mat testR2to5Cs2 = Matrix|R(2:5:2), C(::)|;
+mat testRs2C1to3 = Matrix|R(::2), C(1:3:)|;
